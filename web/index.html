@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="dark light">
+<title>diff</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script src="{{theme}}"></script>
+<link rel="stylesheet" href="{{css}}">
+</head>
+<body>
+<header class="bar">
+  <a class="mark" href="/" title="Start a new diff">diff</a>
+  <div class="seg" role="group" aria-label="Layout">
+    <button data-view="split" aria-pressed="true">Split</button>
+    <button data-view="unified" aria-pressed="false">Unified</button>
+  </div>
+  <div class="seg" role="group" aria-label="Detail">
+    <button data-gran="smart" aria-pressed="true" title="Whole words, tiny gaps merged">Smart</button>
+    <button data-gran="word" aria-pressed="false" title="Every changed word">Word</button>
+    <button data-gran="char" aria-pressed="false" title="Every changed character">Char</button>
+  </div>
+  <span class="grow"></span>
+  <span class="status" id="status" aria-live="polite"></span>
+  <button id="historyBtn" class="ghost" hidden>History</button>
+  <button id="shareBtn" class="primary" hidden>Share</button>
+  <button id="agentBtn" class="ghost agent-btn" title="Connect agent: API for coding agents">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"/></svg>
+    <span>Connect agent</span>
+  </button>
+  <button id="keysBtn" class="icon-btn" title="Keyboard shortcuts" aria-label="Keyboard shortcuts">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>
+  </button>
+  <button id="themeBtn" class="icon-btn"></button>
+  <button id="meBtn" class="me" title="Your name on versions"></button>
+</header>
+
+<div class="banner" id="banner" hidden>
+  <span id="bannerText"></span>
+  <span class="banner-actions" id="bannerActions"></span>
+</div>
+
+<main class="work">
+  <div class="heads" id="heads">
+    <div><span class="label" id="labelA">Before</span><span class="count del" id="delCount"></span></div>
+    <div id="headB"><span class="label">After</span><span class="count add" id="addCount"></span></div>
+  </div>
+  <div id="editor" class="editor"></div>
+</main>
+
+<footer class="foot">
+  <span>diff: what changed between two texts. No login; links are private and never indexed.</span>
+  <a href="/api">API</a>
+  <span>Open source, MIT</span>
+  <a class="foot-gh" href="https://github.com/Brikas/diff" target="_blank" rel="noopener" title="Source on GitHub" aria-label="Source on GitHub">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+  </a>
+</footer>
+
+<aside class="panel" id="history" hidden aria-label="Versions">
+  <div class="panel-top">
+    <h2>Versions</h2>
+    <button class="ghost" id="historyClose">Close</button>
+  </div>
+  <form id="nameForm" class="row" hidden>
+    <input id="nameInput" maxlength="80" placeholder="Name this version" aria-label="Version name">
+    <button class="ghost" type="submit">Save</button>
+  </form>
+  <label class="check"><input type="checkbox" id="namedOnly"> Named only</label>
+  <ol id="versionList" class="versions"></ol>
+  <label class="switch" id="versioningRow" hidden>
+    <input type="checkbox" id="versioningToggle">
+    <span><b>Auto versions</b><small>A new version every 30 minutes, or as soon as someone else edits.</small></span>
+  </label>
+</aside>
+
+<div class="pop" id="sharePop" hidden role="dialog" aria-label="Share">
+  <div class="seg full" id="accessSeg">
+    <button data-access="edit" aria-pressed="true">Can edit</button>
+    <button data-access="view" aria-pressed="false">View only</button>
+  </div>
+  <div class="row">
+    <input id="shareLink" readonly aria-label="Link">
+    <button id="copyBtn" class="primary">Copy</button>
+  </div>
+  <p class="note" id="shareNote"></p>
+</div>
+
+<div class="pop" id="mePop" hidden role="dialog" aria-label="Your name">
+  <form id="meForm" class="row">
+    <input id="meInput" maxlength="40" aria-label="Your name">
+    <button class="primary" type="submit">Save</button>
+  </form>
+  <p class="note">Shown next to the versions you edit.</p>
+</div>
+
+<div class="pop pop-wide" id="agentPop" hidden role="dialog" aria-label="Connect an agent"></div>
+<div class="pop" id="keysPop" hidden role="dialog" aria-label="Keyboard shortcuts"></div>
+
+<script type="module" src="{{js}}"></script>
+</body>
+</html>

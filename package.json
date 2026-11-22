@@ -1,0 +1,29 @@
+{
+  "name": "diff",
+  "private": true,
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/Brikas/diff.git" },
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "start": "node server/main.ts",
+    "dev": "npm run build && SECURE_COOKIES=false PORT=8787 DATA_DIR=./data node server/main.ts",
+    "test": "node --test 'test/*.test.ts'"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@codemirror/commands": "6.11.1",
+    "@codemirror/merge": "6.12.3",
+    "@codemirror/state": "6.7.6",
+    "@codemirror/view": "6.43.15",
+    "@fontsource/atkinson-hyperlegible-mono": "5.3.0",
+    "@fontsource/atkinson-hyperlegible-next": "5.3.0",
+    "@iconify-json/fluent-emoji-high-contrast": "1.2.6",
+    "@types/node": "24.19.2",
+    "diff": "9.0.0",
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2"
+  }
+}

@@ -1,0 +1,252 @@
+/*
+ * Look: tool-like, a plain wordmark in the text colour. References: klup.dk and knap.md from the owner's design notes.
+ * Type: Atkinson Hyperlegible, built so l/I/1 and O/0 never look alike, which a character diff depends on.
+ * Colour belongs to the diff (red removed, green added, blue moved) and to the person badges.
+ */
+@import '@fontsource/atkinson-hyperlegible-next/400.css';
+@import '@fontsource/atkinson-hyperlegible-next/700.css';
+@import '@fontsource/atkinson-hyperlegible-mono/400.css';
+
+/* Each colour is light-dark(light, dark); `color-scheme` picks the side: the system's, or the one the reader chose. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f6f6f7, #0b0b0d);
+  --raise: light-dark(#ffffff, #141417);
+  --line: light-dark(#dcdce1, #24242a);
+  --text: light-dark(#131317, #ececf0);
+  --dim: light-dark(#5f5f6a, #9c9ca6);
+  --del: light-dark(#c2311f, #ff7b6b);
+  --del-bg: light-dark(rgba(194, 49, 31, .045), rgba(255, 123, 107, .07));
+  --del-hit: light-dark(rgba(194, 49, 31, .22), rgba(255, 123, 107, .34));
+  --add: light-dark(#12773f, #63d88f);
+  --add-bg: light-dark(rgba(18, 119, 63, .045), rgba(99, 216, 143, .065));
+  --add-hit: light-dark(rgba(18, 119, 63, .22), rgba(99, 216, 143, .32));
+  --move: light-dark(#1f5fc4, #6ea8ff);
+  --move-bg: light-dark(rgba(31, 95, 196, .08), rgba(110, 168, 255, .12));
+  --move-hit: light-dark(rgba(31, 95, 196, .20), rgba(110, 168, 255, .30));
+  --focus: light-dark(#131317, #ececf0);
+  --sans: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --mono: 'Atkinson Hyperlegible Mono', ui-monospace, monospace;
+}
+:root[data-theme='light'] { color-scheme: light; }
+:root[data-theme='dark'] { color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 var(--sans); }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* ── Bar ── */
+.bar {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; gap: 12px;
+  height: 60px; padding: 0 20px;
+  background: var(--bg); border-bottom: 1px solid var(--line);
+}
+.mark {
+  font-weight: 700; font-size: 26px; letter-spacing: -.02em; color: var(--text); text-decoration: none;
+  margin-right: 12px;
+}
+.grow { flex: 1; }
+.status { color: var(--dim); font-size: 15px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 9px; background: var(--raise); border: 1px solid var(--line); }
+.seg button {
+  border: 0; background: none; padding: 5px 12px; border-radius: 6px; color: var(--dim); font-size: 15px;
+}
+.seg button[aria-pressed='true'] { background: var(--line); color: var(--text); }
+.seg button:disabled { opacity: .4; cursor: not-allowed; }
+.seg.full { display: flex; }
+.seg.full button { flex: 1; }
+
+.ghost, .primary, .me {
+  border-radius: 8px; padding: 7px 14px; font-size: 15px; white-space: nowrap;
+}
+.ghost { background: none; border: 1px solid var(--line); }
+.ghost:hover { border-color: var(--dim); }
+.primary { background: var(--text); color: var(--bg); border: 1px solid var(--text); font-weight: 700; }
+.me { background: none; border: 0; color: var(--dim); padding: 7px 4px; display: inline-flex; align-items: center; gap: 8px; }
+
+/* Person badges: icon in white on the person's colour; a chosen name shows its initial. */
+.avatar {
+  display: inline-grid; place-items: center; flex: none; border-radius: 50%;
+  background: var(--c); color: #fff; font-weight: 700; line-height: 1;
+}
+.avatar-md { width: 28px; height: 28px; font-size: 14px; }
+.avatar-sm { width: 22px; height: 22px; font-size: 12px; }
+.avatar-icon { width: 62%; height: 62%; background: #fff; mask: var(--icon) center / contain no-repeat; }
+.v-avatars { display: inline-flex; align-self: center; }
+.v-avatars .avatar + .avatar { margin-left: -6px; box-shadow: 0 0 0 2px var(--raise); }
+.icon-btn { display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 8px; background: none; border: 1px solid var(--line); color: var(--dim); }
+.icon-btn:hover { color: var(--text); border-color: var(--dim); }
+.icon-btn svg { width: 20px; height: 20px; }
+.me:hover { color: var(--text); }
+
+/* ── Banner ── */
+.banner {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+  padding: 12px 20px; background: var(--raise); border-bottom: 1px solid var(--line); font-size: 16px;
+}
+.banner-actions { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── Panes ── */
+.heads { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--line); }
+.heads > div { display: flex; align-items: baseline; gap: 12px; padding: 14px 28px 10px; }
+.heads > div + div { border-left: 1px solid var(--line); }
+/* Unified: one head, "Changes" with both counts. */
+body[data-layout='unified'] .heads { display: flex; }
+body[data-layout='unified'] #headB { border-left: 0; padding-left: 0; }
+body[data-layout='unified'] #headB .label { display: none; }
+.label { font-weight: 700; font-size: 16px; }
+.count { font: 15px var(--mono); }
+.count.del, .v-delta.del { color: var(--del); }
+.count.add, .v-delta.add { color: var(--add); }
+
+.editor .cm-editor { background: transparent; color: var(--text); font: 17px/1.65 var(--sans); }
+.editor .cm-editor.cm-focused { outline: none; }
+.editor .cm-scroller { font: inherit; }
+.editor .cm-content { padding: 18px 0 40vh; min-height: calc(100vh - 110px); caret-color: var(--text); }
+.editor .cm-line { padding: 0 28px; }
+.editor .cm-placeholder { color: var(--dim); }
+.editor .cm-selectionBackground, .editor .cm-focused .cm-selectionBackground { background: rgba(127, 127, 140, .35) !important; }
+.cm-mergeViewEditor + .cm-mergeViewEditor { border-left: 1px solid var(--line); }
+.cm-mergeView { overflow: visible !important; }
+body.readonly .cm-content { caret-color: transparent; }
+
+/* Only the changed words are marked, never whole rows: removed words red and struck, added words green.
+   A thin halo of the same colour keeps a one-character mark (a quote, a comma) visible. */
+.editor .cm-merge-a .cm-changedLine, .editor .cm-merge-b .cm-changedLine { background: none !important; }
+.editor .cm-deletedChunk { background: var(--del-bg) !important; }
+.editor .cm-merge-a .cm-changedText, .editor .cm-deletedChunk .cm-deletedText {
+  background: var(--del-hit) !important; border-radius: 3px; box-shadow: 0 0 0 1.5px var(--del-hit);
+  text-decoration: line-through; text-decoration-color: var(--del); text-decoration-thickness: 1.5px;
+}
+.editor .cm-merge-b .cm-changedText, .editor .cm-inlineChangedLine .cm-changedText {
+  background: var(--add-hit) !important; border-radius: 3px; box-shadow: 0 0 0 1.5px var(--add-hit);
+}
+.editor .cm-deletedChunk { padding-left: 0; }
+.editor .cm-deletedChunk .cm-deletedLine { padding: 0 28px; }
+.editor .cm-deletedChunk del { text-decoration-color: var(--del); }
+
+/* Unified: wholly new lines are tinted; edits inside a kept line are marked in place, with no row tint. */
+body[data-layout='unified'] .editor .cm-insertedLine { background: var(--add-bg); }
+body[data-layout='unified'] .editor .cm-changedText { background: var(--add-hit); border-radius: 3px; box-shadow: 0 0 0 1.5px var(--add-hit); }
+.editor .cm-line del.cm-deletedText {
+  background: var(--del-hit); border-radius: 3px; margin-right: 2px; box-shadow: 0 0 0 1.5px var(--del-hit);
+  text-decoration: line-through; text-decoration-color: var(--del); text-decoration-thickness: 1.5px;
+}
+/* The old place of moved text: a tag pointing at the new place and a short dim preview, read once. */
+.editor .cm-movedFrom { display: inline-flex; align-items: baseline; gap: 8px; max-width: 100%; }
+.editor .cm-movedFrom .cm-movedBadge { margin-left: 0; }
+.editor .cm-movedPreview { color: var(--dim); font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.editor .cm-deletedLine.cm-movedRow { background: var(--move-bg); }
+
+/* Whitespace edits (line breaks, indents, spacing) are invisible as text, so they get a small marker. */
+.editor .cm-wsGlyph {
+  display: inline-block; margin: 0 3px; padding: 0 5px; border-radius: 4px; font: 14px/1.4 var(--mono);
+  color: var(--dim); border: 1px solid var(--line); vertical-align: 1px; cursor: help;
+}
+
+/* Moved text: blue tint plus a word, never colour alone. Its own edits are marked against the source. */
+.editor .cm-line.cm-moved { background: var(--move-bg) !important; }
+.editor .cm-line.cm-moved .cm-changedText { background: none !important; text-decoration: none; }
+.editor .cm-movedDel { background: var(--del-hit); border-radius: 3px; text-decoration: line-through; text-decoration-color: var(--del); }
+.editor .cm-movedAdd { background: var(--add-hit); border-radius: 3px; }
+.editor .cm-movedText { background: var(--move-hit) !important; border-radius: 3px; }
+/* The merge view's own mark may wrap the move mark; its red, green and strike-through give way to blue. */
+.editor .cm-movedText .cm-changedText, .editor .cm-changedText:has(.cm-movedText) { background: none !important; text-decoration: none; }
+.editor .cm-line.cm-movedCont::after { content: none !important; }
+.editor .cm-line.cm-moved::after, .editor .cm-movedBadge {
+  content: 'moved'; margin-left: 10px; padding: 1px 7px; border-radius: 5px;
+  font: 14px var(--mono); color: var(--move); border: 1px solid currentColor; vertical-align: 1px;
+}
+
+/* ── Footer: what this is, the API, the source ── */
+.foot {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px;
+  padding: 16px 28px 22px; border-top: 1px solid var(--line); color: var(--dim); font-size: 15px;
+}
+.foot a { color: inherit; }
+.foot a:hover { color: var(--text); }
+.foot-gh { display: inline-grid; margin-left: auto; }
+.foot-gh svg { width: 22px; height: 22px; }
+body.panel-open .foot { margin-right: 400px; }
+
+/* ── Versions panel ── */
+.panel {
+  position: fixed; top: 60px; right: 0; bottom: 0; z-index: 4; width: min(400px, 100vw);
+  display: flex; flex-direction: column; gap: 14px; padding: 18px 20px;
+  background: var(--raise); border-left: 1px solid var(--line); overflow-y: auto;
+}
+@media (min-width: 1100px) { body.panel-open .work, body.panel-open .banner { margin-right: 400px; } }
+.panel-top { display: flex; align-items: center; justify-content: space-between; }
+.panel h2 { margin: 0; font-size: 20px; }
+.row { display: flex; gap: 8px; }
+.row input, .pop input {
+  flex: 1; min-width: 0; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg);
+}
+.check { display: flex; gap: 8px; align-items: center; color: var(--dim); font-size: 15px; }
+.versions { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.version {
+  width: 100%; display: grid; grid-template-columns: 44px auto 1fr auto; gap: 10px; align-items: start;
+  padding: 10px; border: 0; border-radius: 8px; background: none; text-align: left;
+}
+.version:hover { background: var(--line); }
+.version[aria-current='true'] { background: var(--line); }
+.v-n { font: 15px var(--mono); color: var(--dim); padding-top: 1px; }
+.v-main { display: flex; flex-direction: column; min-width: 0; }
+.v-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.v-who { color: var(--dim); font-size: 15px; }
+.v-delta { font: 15px var(--mono); color: var(--dim); padding-top: 1px; }
+.switch { display: flex; gap: 10px; align-items: flex-start; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); }
+.switch input { margin-top: 5px; }
+.switch span { display: flex; flex-direction: column; }
+.switch small { color: var(--dim); font-size: 15px; }
+
+/* ── Popovers ── */
+.pop {
+  position: fixed; z-index: 6; width: min(440px, calc(100vw - 24px));
+  display: flex; flex-direction: column; gap: 12px; padding: 16px;
+  background: var(--raise); border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .35);
+}
+.note { margin: 0; color: var(--dim); font-size: 15px; }
+.pop-wide { width: min(560px, calc(100vw - 24px)); }
+.pop-title { margin: 0; font-size: 18px; }
+.field-label { font-size: 15px; font-weight: 700; margin-top: 4px; }
+.pop a.ghost { color: inherit; text-decoration: none; display: inline-flex; align-items: center; }
+
+/* Connect agent */
+.agent-btn { display: inline-flex; align-items: center; gap: 8px; }
+.agent-btn svg { width: 18px; height: 18px; }
+.agent-logos { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; color: var(--dim); }
+.agent-logo { display: inline-grid; width: 26px; height: 26px; }
+.agent-logo svg { width: 100%; height: 100%; }
+.agent-prompt {
+  width: 100%; resize: vertical; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--text); font: 15px/1.5 var(--mono);
+}
+
+/* Keyboard shortcuts list */
+.keys-group { margin: 6px 0 0; font-size: 15px; color: var(--dim); font-weight: 700; }
+.keys { display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; margin: 0; font-size: 15px; }
+.keys dt { margin: 0; }
+.keys dd { margin: 0; text-align: right; }
+kbd {
+  display: inline-block; min-width: 26px; padding: 1px 7px; border-radius: 5px; text-align: center;
+  font: 14px/1.5 var(--mono); border: 1px solid var(--line); border-bottom-width: 2px; background: var(--bg);
+}
+#keysPop { max-height: calc(100vh - 90px); overflow-y: auto; }
+
+/* ── Narrow screens: unified view only, fewer controls in the bar ── */
+@media (max-width: 760px) {
+  .bar { gap: 8px; padding: 0 12px; overflow-x: auto; }
+  .bar .seg:first-of-type { display: none; }
+  .mark { margin-right: 4px; }
+  .status { display: none; }
+  .agent-btn span, .me span { display: none; }
+  .editor .cm-line, .editor .cm-deletedChunk .cm-deletedLine { padding: 0 16px; }
+  .heads > div { padding: 12px 16px 8px; }
+}

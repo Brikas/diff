@@ -1,0 +1,35 @@
+# diff: public text diff at diff.brikas.dev (source: /srv/apps/diff). It runs as user `diff` under rootless Docker,
+# which Traefik's Docker provider cannot see, and is published on the `web` bridge gateway.
+# Root-owned on purpose: the diff user cannot change which hostname reaches it.
+http:
+  routers:
+    diff:
+      rule: Host(`diff.brikas.dev`)
+      entryPoints: [websecure]
+      service: diff
+      middlewares: [diff-ratelimit, diff-inflight, diff-body]
+      tls:
+        certResolver: myresolver
+      # Every page URL is a secret edit or view link; it must not reach the access log.
+      observability:
+        accessLogs: false
+  middlewares:
+    diff-ratelimit:
+      rateLimit:
+        # Per client IP. A page load fetches about 10 files; the app applies its own per-IP write limits behind this.
+        average: 20
+        burst: 80
+    diff-inflight:
+      inFlightReq:
+        # Per client IP: open requests at once, so one source cannot hold all the app's connections.
+        amount: 10
+    diff-body:
+      buffering:
+        # Refused before it reaches the app: a diff is at most 1 MB of text, about 2 MB once JSON-escaped.
+        maxRequestBodyBytes: 3000000
+        memRequestBodyBytes: 1048576
+  services:
+    diff:
+      loadBalancer:
+        servers:
+          - url: http://172.19.0.1:9710

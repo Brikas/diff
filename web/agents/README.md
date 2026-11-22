@@ -1,0 +1,1 @@
+Agent logos from LobeHub Icons (`@lobehub/icons-static-svg` 1.105.0, MIT, https://github.com/lobehub/lobe-icons). The marks belong to their owners; they appear only to show which agents can use the API.

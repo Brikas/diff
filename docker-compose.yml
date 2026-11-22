@@ -1,0 +1,29 @@
+# Runs under the `diff` user's rootless Docker. Traefik reaches it on the `web` bridge gateway (deploy/traefik-diff.yml).
+services:
+  diff:
+    image: diff:latest
+    container_name: diff
+    restart: unless-stopped
+    read_only: true
+    user: "65532:65532"
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    # Hard caps, so a flood degrades this app and nothing else. The whole `diff` user is capped again by its
+    # systemd slice (deploy/setup-box.sh): memory, CPU, tasks and disk I/O speed.
+    mem_limit: 256m
+    memswap_limit: 256m       # same as memory: no swap
+    cpus: 0.5
+    pids_limit: 64
+    ulimits:
+      nofile: { soft: 1024, hard: 1024 }
+    env_file: .env
+    environment:
+      TZ: Europe/Copenhagen
+    volumes:
+      # A fixed-size disk image mounted here by deploy/setup-box.sh: the database cannot outgrow it.
+      - ./data:/data
+    ports:
+      - "${PUBLISH_IP}:${PUBLISH_PORT}:8080"
+    logging:
+      driver: json-file
+      options: { max-size: 10m, max-file: "3" }

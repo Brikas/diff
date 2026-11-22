@@ -1,0 +1,286 @@
+[
+  {
+    "id": "b01",
+    "category": "one-word-edit-nested",
+    "title": "One word changed in one bullet of a long nested list",
+    "before": "# Autumn campaign plan\n- Strategy\n  - Audience\n    - Marketing managers at mid-size B2B firms\n    - Event organisers moving from in-person to hybrid\n  - Positioning\n    - Lead with ease of setup\n    - Support claims with customer proof\n  - Budget\n    - Paid media\n      - LinkedIn sponsored posts\n      - Google search ads\n    - Content production\n      - Video shoots\n      - Freelance writer\n- Content\n  - Blog\n    - Five posts, one per week\n    - Guest post from partner agency\n  - Video\n    - Customer story, three minutes\n    - Product teaser for social\n  - Email\n    - Welcome series, four emails\n    - Re-engagement for dormant leads\n- Measurement\n  - Weekly dashboard review\n  - Monthly attribution report\n  - Quarter-end retrospective",
+    "after": "# Autumn campaign plan\n- Strategy\n  - Audience\n    - Marketing managers at mid-size B2B firms\n    - Event organisers moving from in-person to hybrid\n  - Positioning\n    - Lead with speed of setup\n    - Support claims with customer proof\n  - Budget\n    - Paid media\n      - LinkedIn sponsored posts\n      - Google search ads\n    - Content production\n      - Video shoots\n      - Freelance writer\n- Content\n  - Blog\n    - Five posts, one per week\n    - Guest post from partner agency\n  - Video\n    - Customer story, three minutes\n    - Product teaser for social\n  - Email\n    - Welcome series, four emails\n    - Re-engagement for dormant leads\n- Measurement\n  - Weekly dashboard review\n  - Monthly attribution report\n  - Quarter-end retrospective",
+    "edits": [
+      "in bullet \"Lead with ease of setup\" (under Strategy > Positioning) replaced the word \"ease\" with \"speed\", giving \"Lead with speed of setup\"; nothing else changed"
+    ]
+  },
+  {
+    "id": "b02",
+    "category": "reorder-siblings",
+    "title": "One bullet moved up among its siblings",
+    "before": "## Agenda\n- Welcome and introductions\n- Review of last month's numbers\n- Hiring update\n- Office move timeline\n- Customer feedback themes\n- Any other business",
+    "after": "## Agenda\n- Welcome and introductions\n- Customer feedback themes\n- Review of last month's numbers\n- Hiring update\n- Office move timeline\n- Any other business",
+    "edits": [
+      "moved bullet \"Customer feedback themes\" from 5th position to 2nd position (after \"Welcome and introductions\"); no text changed"
+    ]
+  },
+  {
+    "id": "b03",
+    "category": "move-to-other-parent",
+    "title": "Bullet moved from a Q1 section to a Q2 section",
+    "before": "## Q1\n- Website\n  - Refresh pricing page\n  - Fix mobile navigation\n- Events\n  - Book spring conference stand\n  - Draft speaker brief\n\n## Q2\n- Website\n  - Add case study section\n- Events\n  - Run summer webinar",
+    "after": "## Q1\n- Website\n  - Refresh pricing page\n  - Fix mobile navigation\n- Events\n  - Book spring conference stand\n\n## Q2\n- Website\n  - Add case study section\n- Events\n  - Run summer webinar\n  - Draft speaker brief",
+    "edits": [
+      "moved bullet \"Draft speaker brief\" from under Q1 > Events to the end of Q2 > Events (after \"Run summer webinar\"); text unchanged"
+    ]
+  },
+  {
+    "id": "b04",
+    "category": "move-subtree",
+    "title": "Whole subtree (parent plus two children) moved to another parent",
+    "before": "- Onboarding project\n  - Customer setup\n    - Create workspace\n    - Import branding\n    - Invite team\n  - Training\n    - Record walkthrough video\n    - Schedule live session\n  - Handover\n    - Send summary email\n    - Book 30-day check-in\n- Renewals project\n  - Prepare renewal list\n  - Review usage data",
+    "after": "- Onboarding project\n  - Customer setup\n    - Create workspace\n    - Import branding\n    - Invite team\n  - Handover\n    - Send summary email\n    - Book 30-day check-in\n- Renewals project\n  - Prepare renewal list\n  - Review usage data\n  - Training\n    - Record walkthrough video\n    - Schedule live session",
+    "edits": [
+      "moved the subtree \"Training\" together with its children \"Record walkthrough video\" and \"Schedule live session\" from under \"Onboarding project\" to the end of \"Renewals project\" (after \"Review usage data\"); the children stay in order beneath it; no text changed"
+    ]
+  },
+  {
+    "id": "b05",
+    "category": "indent-one-bullet",
+    "title": "One bullet indented one level, text unchanged",
+    "before": "- Design review\n  - Homepage hero needs a shorter headline\n  - Navigation\n  - Mobile menu overlaps the logo\n  - Footer links are outdated",
+    "after": "- Design review\n  - Homepage hero needs a shorter headline\n  - Navigation\n    - Mobile menu overlaps the logo\n  - Footer links are outdated",
+    "edits": [
+      "indented bullet \"Mobile menu overlaps the logo\" one level (from 2 to 4 spaces) so it becomes a child of \"Navigation\"; text unchanged, position unchanged"
+    ]
+  },
+  {
+    "id": "b06",
+    "category": "outdent-one-bullet",
+    "title": "One bullet outdented one level, text unchanged",
+    "before": "* Hiring plan\n  * Engineering\n    * Backend developer\n    * Frontend developer\n    * Data analyst\n  * Sales\n    * Account executive",
+    "after": "* Hiring plan\n  * Engineering\n    * Backend developer\n    * Frontend developer\n  * Data analyst\n  * Sales\n    * Account executive",
+    "edits": [
+      "outdented bullet \"Data analyst\" one level (from 4 to 2 spaces) so it is no longer a child of \"Engineering\" and is now a sibling between \"Engineering\" and \"Sales\"; text unchanged"
+    ]
+  },
+  {
+    "id": "b07",
+    "category": "reindent-block",
+    "title": "Whole list re-indented from 2 spaces to 4 spaces, no text change",
+    "before": "- Release checklist\n  - Code freeze\n    - Merge open pull requests\n    - Tag release candidate\n  - Testing\n    - Run regression suite\n    - Verify on staging\n  - Announcement\n    - Write changelog\n    - Notify support team\n- Post-release\n  - Monitor error rates\n  - Collect user feedback",
+    "after": "- Release checklist\n    - Code freeze\n        - Merge open pull requests\n        - Tag release candidate\n    - Testing\n        - Run regression suite\n        - Verify on staging\n    - Announcement\n        - Write changelog\n        - Notify support team\n- Post-release\n    - Monitor error rates\n    - Collect user feedback",
+    "edits": [
+      "re-indented every nested bullet from 2-space steps to 4-space steps (level 2 from 2 to 4 spaces, level 3 from 4 to 8 spaces); no text changed, no bullet moved, nesting structure identical"
+    ]
+  },
+  {
+    "id": "b08",
+    "category": "renumber-insert",
+    "title": "Numbered list renumbered after inserting an item at position 2",
+    "before": "## Steps to publish a webinar\n1. Create the event page\n2. Upload the speaker photos\n3. Configure the registration form\n4. Send the test invite\n5. Go live",
+    "after": "## Steps to publish a webinar\n1. Create the event page\n2. Write the speaker biographies\n3. Upload the speaker photos\n4. Configure the registration form\n5. Send the test invite\n6. Go live",
+    "edits": [
+      "inserted new item \"Write the speaker biographies\" at position 2",
+      "renumbered \"Upload the speaker photos\" from 2 to 3, \"Configure the registration form\" from 3 to 4, \"Send the test invite\" from 4 to 5, \"Go live\" from 5 to 6; their text is unchanged"
+    ]
+  },
+  {
+    "id": "b09",
+    "category": "split-bullet",
+    "title": "One bullet split into two bullets",
+    "before": "## Follow-ups\n- Send the notes to the team\n- Update the pricing page and notify the sales team about the new tiers\n- Archive the old brochure",
+    "after": "## Follow-ups\n- Send the notes to the team\n- Update the pricing page\n- Notify the sales team about the new tiers\n- Archive the old brochure",
+    "edits": [
+      "split bullet \"Update the pricing page and notify the sales team about the new tiers\" into two bullets: \"Update the pricing page\" and \"Notify the sales team about the new tiers\"",
+      "the connecting word \"and\" was removed and \"notify\" was capitalised to \"Notify\" as the new bullet start; the rest of the words are unchanged"
+    ]
+  },
+  {
+    "id": "b10",
+    "category": "merge-bullets",
+    "title": "Two bullets merged into one",
+    "before": "## Workshop prep\n- Book the room\n- Draft the agenda\n- Share the agenda with speakers\n- Order lunch",
+    "after": "## Workshop prep\n- Book the room\n- Draft the agenda and share it with speakers\n- Order lunch",
+    "edits": [
+      "merged bullets \"Draft the agenda\" and \"Share the agenda with speakers\" into one bullet \"Draft the agenda and share it with speakers\"",
+      "in the merged text, \"the agenda\" in the second part became \"it\" and \"and\" was added as the joiner"
+    ]
+  },
+  {
+    "id": "b11",
+    "category": "bullet-to-parent",
+    "title": "Existing bullet turned into a parent with new children",
+    "before": "- Launch tasks\n  - Prepare launch materials\n  - Brief the support team\n  - Update the website",
+    "after": "- Launch tasks\n  - Prepare launch materials\n    - Write press release\n    - Design social cards\n    - Record demo video\n  - Brief the support team\n  - Update the website",
+    "edits": [
+      "added three new child bullets under \"Prepare launch materials\", in this order: \"Write press release\", \"Design social cards\", \"Record demo video\"; existing bullets unchanged"
+    ]
+  },
+  {
+    "id": "b12",
+    "category": "insert-middle",
+    "title": "New bullets inserted in the middle, one nested",
+    "before": "# Weekly priorities\n- Close out Q3 report\n- Interview two candidates\n- Finish webinar slides\n- Prepare board update\n- Review budget",
+    "after": "# Weekly priorities\n- Close out Q3 report\n- Interview two candidates\n- Reply to partner agency\n- Book the venue visit\n- Finish webinar slides\n  - Add speaker notes\n- Prepare board update\n- Review budget",
+    "edits": [
+      "inserted new bullet \"Reply to partner agency\" between \"Interview two candidates\" and \"Finish webinar slides\"",
+      "inserted new bullet \"Book the venue visit\" directly after \"Reply to partner agency\"",
+      "inserted new child bullet \"Add speaker notes\" under \"Finish webinar slides\""
+    ]
+  },
+  {
+    "id": "b13",
+    "category": "delete-bullets",
+    "title": "Two non-adjacent bullets deleted",
+    "before": "## Open questions\n- Who owns the translation budget?\n- Do we need legal review for the case study?\n- Is the Berlin event confirmed?\n- Which tool will we use for the poll?\n- Should we record the dry run?\n- Can we reuse last year's template?",
+    "after": "## Open questions\n- Who owns the translation budget?\n- Is the Berlin event confirmed?\n- Which tool will we use for the poll?\n- Can we reuse last year's template?",
+    "edits": [
+      "deleted bullet \"Do we need legal review for the case study?\"",
+      "deleted bullet \"Should we record the dry run?\""
+    ]
+  },
+  {
+    "id": "b14",
+    "category": "delete-parent-promote",
+    "title": "Parent bullet deleted, its children promoted one level",
+    "before": "- Website tasks\n  - Content updates\n    - Replace hero image\n    - Update team page\n    - Fix broken links\n  - SEO\n    - Rewrite meta descriptions\n- Event tasks\n  - Confirm catering",
+    "after": "- Website tasks\n  - Replace hero image\n  - Update team page\n  - Fix broken links\n  - SEO\n    - Rewrite meta descriptions\n- Event tasks\n  - Confirm catering",
+    "edits": [
+      "deleted the parent bullet \"Content updates\"",
+      "its children \"Replace hero image\", \"Update team page\" and \"Fix broken links\" were outdented one level (from 4 to 2 spaces) and now sit directly under \"Website tasks\", before \"SEO\"; their text is unchanged"
+    ]
+  },
+  {
+    "id": "b15",
+    "category": "checklist-tick",
+    "title": "Three checklist items ticked",
+    "before": "## Pre-event checklist\n- [ ] Confirm speakers\n- [ ] Send reminder email\n- [ ] Test the stream\n  - [ ] Check audio levels\n  - [ ] Check screen sharing\n- [ ] Print name badges\n- [ ] Brief the moderators",
+    "after": "## Pre-event checklist\n- [x] Confirm speakers\n- [x] Send reminder email\n- [ ] Test the stream\n  - [x] Check audio levels\n  - [ ] Check screen sharing\n- [ ] Print name badges\n- [ ] Brief the moderators",
+    "edits": [
+      "ticked \"Confirm speakers\" from [ ] to [x]",
+      "ticked \"Send reminder email\" from [ ] to [x]",
+      "ticked nested item \"Check audio levels\" from [ ] to [x]",
+      "all other checklist items remain unticked"
+    ]
+  },
+  {
+    "id": "b16",
+    "category": "marker-change",
+    "title": "Bullet marker changed from - to * across the whole list",
+    "before": "- Groceries\n  - Oat milk\n  - Coffee beans\n  - Rye bread\n- Household\n  - Light bulbs\n  - Dish soap",
+    "after": "* Groceries\n  * Oat milk\n  * Coffee beans\n  * Rye bread\n* Household\n  * Light bulbs\n  * Dish soap",
+    "edits": [
+      "changed the bullet marker from \"-\" to \"*\" on all 8 bullets at every level; text, order and indentation unchanged"
+    ]
+  },
+  {
+    "id": "b17",
+    "category": "edit-and-reorder",
+    "title": "Bullets edited and reordered at the same time",
+    "before": "## Retrospective actions\n- Shorten the weekly meeting to 30 minutes\n- Document the onboarding process\n- Set up a shared inbox for partner requests\n- Review the support rota\n- Agree a naming convention for campaigns",
+    "after": "## Retrospective actions\n- Agree a naming convention for campaigns\n- Shorten the weekly meeting to 30 minutes\n- Set up a shared mailbox for partner requests\n- Document the onboarding process in the wiki\n- Review the support rota",
+    "edits": [
+      "moved bullet \"Agree a naming convention for campaigns\" from last to first position; text unchanged",
+      "moved bullet \"Document the onboarding process\" from 2nd position to 4th, after the shared mailbox bullet",
+      "in \"Set up a shared inbox for partner requests\" replaced \"inbox\" with \"mailbox\"",
+      "in \"Document the onboarding process\" appended \" in the wiki\"",
+      "\"Shorten the weekly meeting to 30 minutes\" and \"Review the support rota\" have unchanged text"
+    ]
+  },
+  {
+    "id": "b18",
+    "category": "long-bullets-sentence-edit",
+    "title": "One sentence rewritten in a long multi-sentence bullet",
+    "before": "## Risks\n- Speaker availability. Two of the five confirmed speakers have conflicting travel plans in the same week. We should ask for backup recordings by the end of the month.\n- Platform load. Last year's event peaked at 800 concurrent viewers and the stream stayed stable. We expect similar numbers this year, so no extra capacity is planned.\n- Budget overrun. Catering quotes have risen by about ten percent since spring. The finance team has asked us to find savings elsewhere before the next review.",
+    "after": "## Risks\n- Speaker availability. Two of the five confirmed speakers have conflicting travel plans in the same week. We should ask for backup recordings by the end of the month.\n- Platform load. Last year's event peaked at 800 concurrent viewers and the stream stayed stable. We expect about 1,200 viewers this year, so we will ask the platform team to add extra capacity.\n- Budget overrun. Catering quotes have risen by about ten percent since spring. The finance team has asked us to find savings elsewhere before the next review.",
+    "edits": [
+      "in the \"Platform load\" bullet, rewrote the third sentence from \"We expect similar numbers this year, so no extra capacity is planned.\" to \"We expect about 1,200 viewers this year, so we will ask the platform team to add extra capacity.\"",
+      "the first two sentences of that bullet and the other two bullets are unchanged"
+    ]
+  },
+  {
+    "id": "b19",
+    "category": "paragraph-to-bullets",
+    "title": "Prose paragraph turned into bullets",
+    "before": "## Meeting summary\nWe agreed to move the launch date to 14 March because the translations will not be ready before then. Hanne will contact the translation agency to confirm the new deadline. Jonas will update the project plan and share it with the team by Friday. The budget stays unchanged.",
+    "after": "## Meeting summary\n- Launch date moves to 14 March because the translations will not be ready before then.\n- Hanne will contact the translation agency to confirm the new deadline.\n- Jonas will update the project plan and share it with the team by Friday.\n- The budget stays unchanged.",
+    "edits": [
+      "restructured the single paragraph into four bullets, one per sentence",
+      "reworded the first sentence from \"We agreed to move the launch date to 14 March because the translations will not be ready before then.\" to \"Launch date moves to 14 March because the translations will not be ready before then.\"",
+      "the other three sentences keep their exact wording, only gaining a \"- \" marker"
+    ]
+  },
+  {
+    "id": "b20",
+    "category": "bullets-to-paragraph",
+    "title": "Bullets turned back into a paragraph",
+    "before": "## Customer call recap\n- The customer wants webinar recordings available for 90 days.\n- They asked about integrating registrations with their CRM.\n- Their IT team needs to review the single sign-on options.\n- Next call is scheduled for the first week of December.",
+    "after": "## Customer call recap\nThe customer wants webinar recordings available for 90 days. They asked about integrating registrations with their CRM. Their IT team needs to review the single sign-on options. The next call is scheduled for the first week of December.",
+    "edits": [
+      "merged the four bullets into one paragraph by removing the \"- \" markers and joining the sentences with spaces",
+      "in the last sentence changed \"Next call is scheduled\" to \"The next call is scheduled\" (added \"The\", lowercased \"Next\")",
+      "the first three sentences are unchanged apart from losing the bullet marker"
+    ]
+  },
+  {
+    "id": "b21",
+    "category": "blank-lines-plus-edit",
+    "title": "Blank lines inserted between groups plus one real edit",
+    "before": "## Moving checklist\n- Pack the kitchen\n- Label the boxes\n- Cancel the old internet contract\n- Book the moving van\n- Forward the mail\n- Update the address with the bank",
+    "after": "## Moving checklist\n- Pack the kitchen\n- Label the boxes\n\n- Cancel the old internet contract\n- Book the moving van for Saturday\n\n- Forward the mail\n- Update the address with the bank",
+    "edits": [
+      "inserted a blank line between \"Label the boxes\" and \"Cancel the old internet contract\"",
+      "inserted a blank line between \"Book the moving van for Saturday\" and \"Forward the mail\"",
+      "in bullet \"Book the moving van\" appended \" for Saturday\""
+    ]
+  },
+  {
+    "id": "b22",
+    "category": "long-outline-scattered-edits",
+    "title": "Long outline (60+ lines) with three scattered edits",
+    "before": "# Customer workshop plan\n\n- Preparation\n  - Logistics\n    - Book the meeting room for two days\n    - Order lunch for twelve people\n    - Check projector and microphones\n  - Materials\n    - Print the agenda\n    - Prepare sticky notes and markers\n    - Create the shared slide deck\n  - People\n    - Confirm the facilitator\n    - Invite the customer team\n    - Brief the note taker\n- Day one\n  - Morning\n    - Coffee and registration, 9:00\n    - Welcome and goals\n      - Introduce the facilitators\n      - Review the agenda\n      - Agree the ground rules\n    - Session one: current state\n      - Map the existing process\n        - Capture each step on a sticky note\n        - Mark the painful steps in red\n      - Discuss biggest bottlenecks\n  - Afternoon\n    - Session two: ideas\n      - Break into groups of four\n      - Sketch three solutions each\n      - Present sketches to the room\n    - Dot voting\n      - Give each person five dots\n      - Count the votes\n    - Wrap-up for day one\n- Day two\n  - Morning\n    - Recap of day one\n    - Session three: prototype\n      - Choose the top two ideas\n      - Build a clickable mock-up\n      - Prepare a short demo\n    - Session four: test\n      - Run the demo with two customer users\n      - Collect feedback on cards\n  - Afternoon\n    - Prioritise the feedback\n    - Draft the action plan\n      - Assign owners\n      - Set deadlines\n    - Closing remarks\n- Follow-up\n  - Send the summary within two days\n  - Share the recording link with attendees\n  - Schedule a check-in after one month\n  - Archive the sticky notes as photos",
+    "after": "# Customer workshop plan\n\n- Preparation\n  - Logistics\n    - Book the meeting room for two days\n    - Order lunch for twelve people\n    - Check projector and microphones\n  - Materials\n    - Print the agenda\n    - Prepare sticky notes and markers\n    - Create the shared slide deck\n  - People\n    - Confirm the facilitator\n    - Invite the customer team\n    - Brief the note taker\n- Day one\n  - Morning\n    - Coffee and registration, 9:30\n    - Welcome and goals\n      - Introduce the facilitators\n      - Review the agenda\n      - Agree the ground rules\n    - Session one: current state\n      - Map the existing process\n        - Capture each step on a sticky note\n        - Mark the painful steps in red\n      - Discuss biggest bottlenecks\n  - Afternoon\n    - Session two: ideas\n      - Break into groups of five\n      - Sketch three solutions each\n      - Present sketches to the room\n    - Dot voting\n      - Give each person five dots\n      - Count the votes\n    - Wrap-up for day one\n- Day two\n  - Morning\n    - Recap of day one\n    - Session three: prototype\n      - Choose the top two ideas\n      - Build a clickable mock-up\n      - Prepare a short demo\n    - Session four: test\n      - Run the demo with two customer users\n      - Collect feedback on cards\n  - Afternoon\n    - Prioritise the feedback\n    - Draft the action plan\n      - Assign owners\n      - Set deadlines\n    - Closing remarks\n- Follow-up\n  - Send the summary within two days\n  - Share the recording and slides with attendees\n  - Schedule a check-in after one month\n  - Archive the sticky notes as photos",
+    "edits": [
+      "in \"Coffee and registration, 9:00\" (Day one > Morning) changed the time \"9:00\" to \"9:30\"",
+      "in \"Break into groups of four\" (Day one > Afternoon > Session two: ideas) replaced \"four\" with \"five\"",
+      "in \"Share the recording link with attendees\" (Follow-up) changed \"recording link\" to \"recording and slides\"",
+      "every other line is unchanged"
+    ]
+  },
+  {
+    "id": "b23",
+    "category": "very-long-list-swap",
+    "title": "Very long flat list (72 items) where two distant items swap places",
+    "before": "# Roadshow master checklist\n- Copenhagen: confirm venue contract\n- Copenhagen: send speaker briefs\n- Copenhagen: order printed signage\n- Copenhagen: publish registration page\n- Copenhagen: schedule reminder emails\n- Copenhagen: arrange catering\n- Copenhagen: book AV technician\n- Copenhagen: prepare follow-up survey\n- Copenhagen: pack swag boxes\n- Aarhus: confirm venue contract\n- Aarhus: send speaker briefs\n- Aarhus: order printed signage\n- Aarhus: publish registration page\n- Aarhus: schedule reminder emails\n- Aarhus: arrange catering\n- Aarhus: book AV technician\n- Aarhus: prepare follow-up survey\n- Aarhus: pack swag boxes\n- Odense: confirm venue contract\n- Odense: send speaker briefs\n- Odense: order printed signage\n- Odense: publish registration page\n- Odense: schedule reminder emails\n- Odense: arrange catering\n- Odense: book AV technician\n- Odense: prepare follow-up survey\n- Odense: pack swag boxes\n- Aalborg: confirm venue contract\n- Aalborg: send speaker briefs\n- Aalborg: order printed signage\n- Aalborg: publish registration page\n- Aalborg: schedule reminder emails\n- Aalborg: arrange catering\n- Aalborg: book AV technician\n- Aalborg: prepare follow-up survey\n- Aalborg: pack swag boxes\n- Stockholm: confirm venue contract\n- Stockholm: send speaker briefs\n- Stockholm: order printed signage\n- Stockholm: publish registration page\n- Stockholm: schedule reminder emails\n- Stockholm: arrange catering\n- Stockholm: book AV technician\n- Stockholm: prepare follow-up survey\n- Stockholm: pack swag boxes\n- Gothenburg: confirm venue contract\n- Gothenburg: send speaker briefs\n- Gothenburg: order printed signage\n- Gothenburg: publish registration page\n- Gothenburg: schedule reminder emails\n- Gothenburg: arrange catering\n- Gothenburg: book AV technician\n- Gothenburg: prepare follow-up survey\n- Gothenburg: pack swag boxes\n- Oslo: confirm venue contract\n- Oslo: send speaker briefs\n- Oslo: order printed signage\n- Oslo: publish registration page\n- Oslo: schedule reminder emails\n- Oslo: arrange catering\n- Oslo: book AV technician\n- Oslo: prepare follow-up survey\n- Oslo: pack swag boxes\n- Helsinki: confirm venue contract\n- Helsinki: send speaker briefs\n- Helsinki: order printed signage\n- Helsinki: publish registration page\n- Helsinki: schedule reminder emails\n- Helsinki: arrange catering\n- Helsinki: book AV technician\n- Helsinki: prepare follow-up survey\n- Helsinki: pack swag boxes",
+    "after": "# Roadshow master checklist\n- Copenhagen: confirm venue contract\n- Copenhagen: send speaker briefs\n- Copenhagen: order printed signage\n- Copenhagen: publish registration page\n- Copenhagen: schedule reminder emails\n- Copenhagen: arrange catering\n- Copenhagen: book AV technician\n- Copenhagen: prepare follow-up survey\n- Copenhagen: pack swag boxes\n- Aarhus: confirm venue contract\n- Aarhus: send speaker briefs\n- Aarhus: order printed signage\n- Aarhus: publish registration page\n- Aarhus: schedule reminder emails\n- Aarhus: arrange catering\n- Aarhus: book AV technician\n- Aarhus: prepare follow-up survey\n- Aarhus: pack swag boxes\n- Odense: confirm venue contract\n- Gothenburg: arrange catering\n- Odense: order printed signage\n- Odense: publish registration page\n- Odense: schedule reminder emails\n- Odense: arrange catering\n- Odense: book AV technician\n- Odense: prepare follow-up survey\n- Odense: pack swag boxes\n- Aalborg: confirm venue contract\n- Aalborg: send speaker briefs\n- Aalborg: order printed signage\n- Aalborg: publish registration page\n- Aalborg: schedule reminder emails\n- Aalborg: arrange catering\n- Aalborg: book AV technician\n- Aalborg: prepare follow-up survey\n- Aalborg: pack swag boxes\n- Stockholm: confirm venue contract\n- Stockholm: send speaker briefs\n- Stockholm: order printed signage\n- Stockholm: publish registration page\n- Stockholm: schedule reminder emails\n- Stockholm: arrange catering\n- Stockholm: book AV technician\n- Stockholm: prepare follow-up survey\n- Stockholm: pack swag boxes\n- Gothenburg: confirm venue contract\n- Gothenburg: send speaker briefs\n- Gothenburg: order printed signage\n- Gothenburg: publish registration page\n- Gothenburg: schedule reminder emails\n- Odense: send speaker briefs\n- Gothenburg: book AV technician\n- Gothenburg: prepare follow-up survey\n- Gothenburg: pack swag boxes\n- Oslo: confirm venue contract\n- Oslo: send speaker briefs\n- Oslo: order printed signage\n- Oslo: publish registration page\n- Oslo: schedule reminder emails\n- Oslo: arrange catering\n- Oslo: book AV technician\n- Oslo: prepare follow-up survey\n- Oslo: pack swag boxes\n- Helsinki: confirm venue contract\n- Helsinki: send speaker briefs\n- Helsinki: order printed signage\n- Helsinki: publish registration page\n- Helsinki: schedule reminder emails\n- Helsinki: arrange catering\n- Helsinki: book AV technician\n- Helsinki: prepare follow-up survey\n- Helsinki: pack swag boxes",
+    "edits": [
+      "swapped the positions of bullet \"Odense: send speaker briefs\" (item 20 of 72) and bullet \"Gothenburg: arrange catering\" (item 51 of 72); no text changed in either bullet",
+      "all other 70 bullets are unchanged and in the same order"
+    ]
+  },
+  {
+    "id": "b24",
+    "category": "identical-control",
+    "title": "Control: before and after are identical",
+    "before": "## Weekly sync notes\n- Updates\n  - Marketing: webinar signups at 420\n  - Sales: two new proposals sent\n  - Support: backlog cleared\n- Decisions\n  - Move the demo day to Thursday\n  - Pause the paid social test\n- Actions\n  - [ ] Send recap email\n  - [x] Update the shared tracker",
+    "after": "## Weekly sync notes\n- Updates\n  - Marketing: webinar signups at 420\n  - Sales: two new proposals sent\n  - Support: backlog cleared\n- Decisions\n  - Move the demo day to Thursday\n  - Pause the paid social test\n- Actions\n  - [ ] Send recap email\n  - [x] Update the shared tracker",
+    "edits": []
+  },
+  {
+    "id": "b25",
+    "category": "deep-nesting-tabs-one-word",
+    "title": "Five levels of tab indentation with one word changed at the deepest level",
+    "before": "- Platform roadmap\n\t- Video hosting\n\t\t- Player\n\t\t\t- Controls\n\t\t\t\t- Playback speed menu\n\t\t\t\t- Keyboard shortcuts\n\t\t\t\t\t- Space toggles play and pause\n\t\t\t\t\t- Arrow keys seek ten seconds\n\t\t\t- Branding\n\t\t\t\t- Custom colours\n\t\t- Library\n\t\t\t- Folder views\n\t- Webinars\n\t\t- Registration\n\t\t\t- Custom questions",
+    "after": "- Platform roadmap\n\t- Video hosting\n\t\t- Player\n\t\t\t- Controls\n\t\t\t\t- Playback speed menu\n\t\t\t\t- Keyboard shortcuts\n\t\t\t\t\t- Space toggles play and pause\n\t\t\t\t\t- Arrow keys seek five seconds\n\t\t\t- Branding\n\t\t\t\t- Custom colours\n\t\t- Library\n\t\t\t- Folder views\n\t- Webinars\n\t\t- Registration\n\t\t\t- Custom questions",
+    "edits": [
+      "in the level-5 bullet \"Arrow keys seek ten seconds\" replaced the word \"ten\" with \"five\"; tab indentation and everything else unchanged"
+    ]
+  },
+  {
+    "id": "b26",
+    "category": "swap-sibling-subtrees",
+    "title": "Two sibling subtrees swap places (4-space nesting)",
+    "before": "- Discovery\n    - Interview five customers\n    - Review support tickets\n- Design\n    - Draft wireframes\n    - Test with three users\n- Build\n    - Implement the new flow\n    - Write release notes",
+    "after": "- Design\n    - Draft wireframes\n    - Test with three users\n- Discovery\n    - Interview five customers\n    - Review support tickets\n- Build\n    - Implement the new flow\n    - Write release notes",
+    "edits": [
+      "moved the subtree \"Design\" (with children \"Draft wireframes\" and \"Test with three users\") above the subtree \"Discovery\" (with children \"Interview five customers\" and \"Review support tickets\"), so the two top-level sections swap places; no text changed, children order within each subtree unchanged",
+      "\"Build\" subtree unchanged"
+    ]
+  }
+]

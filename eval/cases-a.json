@@ -1,0 +1,349 @@
+[
+  {
+    "id": "a01",
+    "category": "single-word-swap",
+    "title": "One word swapped in a single long paragraph",
+    "before": "Our quarterly planning process starts with a short written brief from each team lead. The brief covers three things: what shipped last quarter, what slipped and why, and what the team wants to take on next. Leads send the briefs to Kristian by the Friday before planning week, and he collates them into a single document that everyone can read before the kickoff call. During the call itself we skip the slide decks and go straight to the open questions. The goal is to leave with a ranked list of commitments, each with a named owner, so nobody walks out wondering who is meant to do what.",
+    "after": "Our quarterly planning process starts with a short written brief from each team lead. The brief covers three things: what shipped last quarter, what slipped and why, and what the team wants to take on next. Leads send the briefs to Kristian by the Friday before planning week, and he merges them into a single document that everyone can read before the kickoff call. During the call itself we skip the slide decks and go straight to the open questions. The goal is to leave with a ranked list of commitments, each with a named owner, so nobody walks out wondering who is meant to do what.",
+    "edits": [
+      "replaced \"collates\" with \"merges\" in the third sentence"
+    ]
+  },
+  {
+    "id": "a02",
+    "category": "typo-fixes",
+    "title": "Four one-character typo fixes across three paragraphs",
+    "before": "Thank you for joining the onboarding sesion on Tuesday. We covered the basic setup of your video hub, including how to upload your first recording and how to chose a thumbnail.\n\nThe second part of the session focused on analytcs. Most teams start by looking at play rate and average watch time, and then move on to comparing campaigns accross channels.\n\nIf you have questions before our next meeting, reply to this message or book time with Jonas. We are happy to walk through the setup again whenever it helps.",
+    "after": "Thank you for joining the onboarding session on Tuesday. We covered the basic setup of your video hub, including how to upload your first recording and how to choose a thumbnail.\n\nThe second part of the session focused on analytics. Most teams start by looking at play rate and average watch time, and then move on to comparing campaigns across channels.\n\nIf you have questions before our next meeting, reply to this message or book time with Jonas. We are happy to walk through the setup again whenever it helps.",
+    "edits": [
+      "fixed typo \"sesion\" to \"session\" in paragraph 1",
+      "fixed typo \"chose\" to \"choose\" in paragraph 1",
+      "fixed typo \"analytcs\" to \"analytics\" in paragraph 2",
+      "fixed typo \"accross\" to \"across\" in paragraph 2"
+    ]
+  },
+  {
+    "id": "a03",
+    "category": "punctuation-and-case",
+    "title": "Punctuation and capitalisation edits only, no word changes",
+    "before": "We moved the launch to Thursday however the press embargo still lifts at nine. Please check the landing page, the pricing table and the signup form before then.\n\nAfter launch, the team will review the numbers on friday morning. Anything unusual goes straight to Mette.",
+    "after": "We moved the launch to Thursday; however, the press embargo still lifts at nine. Please check the landing page, the pricing table, and the signup form before then.\n\nAfter launch the team will review the numbers on Friday morning. Anything unusual goes straight to Mette.",
+    "edits": [
+      "added a semicolon after \"Thursday\" in paragraph 1",
+      "added a comma after \"however\" in paragraph 1",
+      "added a comma after \"pricing table\" (serial comma) in paragraph 1",
+      "removed the comma after \"After launch\" in paragraph 2",
+      "capitalised \"friday\" to \"Friday\" in paragraph 2"
+    ]
+  },
+  {
+    "id": "a04",
+    "category": "scattered-small-edits",
+    "title": "Six small word edits spread through one long soft-wrapped paragraph",
+    "before": "When a visitor lands on a webinar registration page, they decide within a few seconds whether to stay or leave. The headline needs to state the topic and the speaker clearly, and the form should ask for as little as possible. We usually recommend three fields: name, work email and company. Every additional field lowers the conversion rate, sometimes by as much as ten percent. After registration, send a confirmation email immediately and add a calendar invite so the event is not forgotten. Then follow up with a reminder one day before and another one hour before the start. Teams that skip these reminders often see attendance drop well below half of the registrants.",
+    "after": "When a visitor lands on a webinar registration page, they decide within seconds whether to stay or leave. The headline needs to state the topic and the speaker plainly, and the form should ask for as little as possible. We typically recommend three fields: name, work email and company. Every additional field lowers the conversion rate, sometimes by as much as fifteen percent. After registration, send a confirmation email immediately and add a calendar invite so the event is not missed. Then follow up with a reminder one day before and another one hour before the start. Teams that skip these reminders often see attendance drop far below half of the registrants.",
+    "edits": [
+      "deleted \"a few \" so \"within a few seconds\" became \"within seconds\" in sentence 1",
+      "replaced \"clearly\" with \"plainly\" in sentence 2",
+      "replaced \"usually\" with \"typically\" in sentence 3",
+      "replaced \"ten percent\" with \"fifteen percent\" in sentence 4",
+      "replaced \"forgotten\" with \"missed\" in sentence 5",
+      "replaced \"well below half\" with \"far below half\" in the last sentence"
+    ]
+  },
+  {
+    "id": "a05",
+    "category": "sentence-rewrite",
+    "title": "One sentence in the middle of a paragraph rewritten",
+    "before": "Our new office in Aarhus opened in September. The space is bright and open, with room for about forty people. The kitchen is small, so we ended up eating lunch in shifts, and that has not been popular with the team. Parking is free for the first year. Visitors should register at the front desk on arrival.",
+    "after": "Our new office in Aarhus opened in September. The space is bright and open, with room for about forty people. Lunch is staggered because the kitchen cannot seat everyone at once, and several people have asked us to fix it. Parking is free for the first year. Visitors should register at the front desk on arrival.",
+    "edits": [
+      "rewrote the third sentence: \"The kitchen is small, so we ended up eating lunch in shifts, and that has not been popular with the team.\" became \"Lunch is staggered because the kitchen cannot seat everyone at once, and several people have asked us to fix it.\"",
+      "all other sentences unchanged"
+    ]
+  },
+  {
+    "id": "a06",
+    "category": "paragraph-rewrite",
+    "title": "One body paragraph heavily reworded, same meaning",
+    "before": "Release notes for version 4.2\n\nThis release focuses on speed. Pages now load roughly twice as fast on mobile connections, and the editor no longer freezes when you paste large images into a document.\n\nWe also fixed a long-standing bug in the export tool. Files with special characters in their names used to fail silently, which left users wondering where their download had gone.\n\nThanks to everyone who reported issues. Keep the feedback coming.",
+    "after": "Release notes for version 4.2\n\nPerformance is the theme of this update. On mobile networks, pages open in about half the time they used to, and pasting big images into the editor no longer makes it hang.\n\nWe also fixed a long-standing bug in the export tool. Files with special characters in their names used to fail silently, which left users wondering where their download had gone.\n\nThanks to everyone who reported issues. Keep the feedback coming.",
+    "edits": [
+      "rewrote paragraph 2 (\"This release focuses on speed...\") with new wording and the same meaning: \"Performance is the theme of this update. On mobile networks, pages open in about half the time they used to, and pasting big images into the editor no longer makes it hang.\"",
+      "title and other paragraphs unchanged"
+    ]
+  },
+  {
+    "id": "a07",
+    "category": "full-rewrite-control",
+    "title": "Entire text replaced with unrelated text (control)",
+    "before": "The board approved the revised budget on Monday after a long discussion about hiring plans. Most of the increase goes to the engineering team, with a smaller share set aside for customer support.\n\nThe finance team will publish the final numbers next week. Questions can be sent to Rasa in the meantime.",
+    "after": "Sourdough needs patience more than skill. Mix flour, water and starter in the evening, cover the bowl, and leave it on the counter overnight.\n\nIn the morning, fold the dough a few times and let it rest again. Bake it in a hot, covered pot until the crust turns deep brown.",
+    "edits": [
+      "replaced the whole of paragraph 1 (board budget) with unrelated text about sourdough starting \"Sourdough needs patience more than skill.\"",
+      "replaced the whole of paragraph 2 (finance numbers) with unrelated text about folding and baking dough",
+      "no content is shared between before and after"
+    ]
+  },
+  {
+    "id": "a08",
+    "category": "move-sentence-within-paragraph",
+    "title": "One sentence moved earlier within the same paragraph",
+    "before": "The workshop starts at nine in the morning. Please bring a laptop and a charger. We will provide coffee, lunch and all printed materials. Registration closes on Wednesday, so sign up soon. The venue is on the second floor of the harbour building.",
+    "after": "The workshop starts at nine in the morning. Registration closes on Wednesday, so sign up soon. Please bring a laptop and a charger. We will provide coffee, lunch and all printed materials. The venue is on the second floor of the harbour building.",
+    "edits": [
+      "moved the sentence \"Registration closes on Wednesday, so sign up soon.\" from fourth position to second position, directly after the first sentence, within the same paragraph",
+      "no wording changed"
+    ]
+  },
+  {
+    "id": "a09",
+    "category": "move-sentence-across-paragraphs",
+    "title": "One sentence moved from paragraph 1 to the end of paragraph 2",
+    "before": "Our support team answers tickets from eight to six on weekdays. Most questions get a reply within two hours. Urgent issues can be flagged by phone.\n\nBefore you write to us, check the help centre for a guide on your topic. Many common questions, such as resetting a password or changing a billing address, are answered there in a few steps.\n\nWe review all feedback on the help centre every month. If an article confused you, tell us and we will rewrite it.",
+    "after": "Our support team answers tickets from eight to six on weekdays. Most questions get a reply within two hours.\n\nBefore you write to us, check the help centre for a guide on your topic. Many common questions, such as resetting a password or changing a billing address, are answered there in a few steps. Urgent issues can be flagged by phone.\n\nWe review all feedback on the help centre every month. If an article confused you, tell us and we will rewrite it.",
+    "edits": [
+      "moved the sentence \"Urgent issues can be flagged by phone.\" from the end of paragraph 1 to the end of paragraph 2",
+      "no wording changed"
+    ]
+  },
+  {
+    "id": "a10",
+    "category": "sentence-to-own-line",
+    "title": "A sentence cut out of the paragraph and placed on its own new line",
+    "before": "Thank you for the quick turnaround on the draft. The structure is much clearer now. The only open point is the case study on page four, which still needs a quote from the customer. I will chase that on my side. Let me know if the deadline on Friday still works for you.",
+    "after": "Thank you for the quick turnaround on the draft. The structure is much clearer now. The only open point is the case study on page four, which still needs a quote from the customer. Let me know if the deadline on Friday still works for you.\n\nI will chase that on my side.",
+    "edits": [
+      "cut the sentence \"I will chase that on my side.\" out of the middle of the paragraph and placed it as its own new paragraph after the blank line at the end",
+      "no wording changed"
+    ]
+  },
+  {
+    "id": "a11",
+    "category": "paragraph-swap",
+    "title": "Paragraphs 2 and 3 swapped",
+    "before": "The project began as an internal experiment to see whether short clips could replace long product demos on our landing pages.\n\nClip viewers booked demos at nearly the same rate as visitors who read the long page, but they spent far less time on the site.\n\nThe test ran for six weeks across two markets, Denmark and Germany, with traffic split evenly between the two variants.\n\nNext we will extend the test to two more landing pages and compare bounce rates.",
+    "after": "The project began as an internal experiment to see whether short clips could replace long product demos on our landing pages.\n\nThe test ran for six weeks across two markets, Denmark and Germany, with traffic split evenly between the two variants.\n\nClip viewers booked demos at nearly the same rate as visitors who read the long page, but they spent far less time on the site.\n\nNext we will extend the test to two more landing pages and compare bounce rates.",
+    "edits": [
+      "swapped paragraph 2 (\"Clip viewers booked demos...\") and paragraph 3 (\"The test ran for six weeks...\")",
+      "no wording changed"
+    ]
+  },
+  {
+    "id": "a12",
+    "category": "paragraph-rotate",
+    "title": "Three paragraphs rotated: paragraph 2 moved to the end",
+    "before": "The offsite is planned for the second week of March in Gothenburg.\n\nOn the first day we will review the year so far, including the numbers from each region and the open hiring plans.\n\nThe second day is reserved for workshops on pricing and packaging, run by the product and sales leads together.\n\nThe last morning is free time, and the flights home are booked for the afternoon.",
+    "after": "The offsite is planned for the second week of March in Gothenburg.\n\nThe second day is reserved for workshops on pricing and packaging, run by the product and sales leads together.\n\nThe last morning is free time, and the flights home are booked for the afternoon.\n\nOn the first day we will review the year so far, including the numbers from each region and the open hiring plans.",
+    "edits": [
+      "moved paragraph 2 (\"On the first day we will review the year so far...\") to the end, so paragraphs 2, 3 and 4 are rotated: the old paragraph 3 is now 2, the old 4 is now 3, the old 2 is now 4",
+      "paragraph 1 unchanged and no wording changed"
+    ]
+  },
+  {
+    "id": "a13",
+    "category": "move-and-edit-paragraph",
+    "title": "Last paragraph moved to position 2 with one phrase edited",
+    "before": "We are looking for a content producer to join the marketing team in Copenhagen.\n\nYou will plan and record webinars together with our customers and partners, and you will edit the recordings into short clips for social channels.\n\nYou bring at least two years of experience in video production, and you are comfortable working with tight deadlines and changing priorities.\n\nThe role is full time and reports to the head of marketing. We offer a flexible schedule and a team that likes to try new formats.",
+    "after": "We are looking for a content producer to join the marketing team in Copenhagen.\n\nThe role is full time and reports to the head of marketing. We offer flexible hours and a team that likes to try new formats.\n\nYou will plan and record webinars together with our customers and partners, and you will edit the recordings into short clips for social channels.\n\nYou bring at least two years of experience in video production, and you are comfortable working with tight deadlines and changing priorities.",
+    "edits": [
+      "moved the last paragraph (\"The role is full time...\") from position 4 to position 2",
+      "in the moved paragraph replaced \"a flexible schedule\" with \"flexible hours\"",
+      "other paragraphs unchanged"
+    ]
+  },
+  {
+    "id": "a14",
+    "category": "paragraph-split",
+    "title": "One paragraph split into two, no wording changes",
+    "before": "The migration finished over the weekend. All customer sites are now running on the new infrastructure, and response times have dropped by about a third. We still have a few redirects to clean up, which we will finish on Tuesday. If you notice an old link that no longer works, send it to the support team and we will fix it the same day.",
+    "after": "The migration finished over the weekend. All customer sites are now running on the new infrastructure, and response times have dropped by about a third.\n\nWe still have a few redirects to clean up, which we will finish on Tuesday. If you notice an old link that no longer works, send it to the support team and we will fix it the same day.",
+    "edits": [
+      "split the paragraph into two by replacing the space after \"dropped by about a third.\" with a blank line, so \"We still have a few redirects...\" starts a new paragraph",
+      "no wording changed"
+    ]
+  },
+  {
+    "id": "a15",
+    "category": "paragraph-merge",
+    "title": "Paragraphs 1 and 2 merged into one, paragraph 3 untouched",
+    "before": "Registration for the autumn event is now open.\n\nSeats are limited to two hundred people, so we recommend booking early. The ticket includes lunch and access to all sessions.\n\nThe full programme will be published on the event page next month.",
+    "after": "Registration for the autumn event is now open. Seats are limited to two hundred people, so we recommend booking early. The ticket includes lunch and access to all sessions.\n\nThe full programme will be published on the event page next month.",
+    "edits": [
+      "merged paragraph 1 and paragraph 2 by replacing the blank line after \"Registration for the autumn event is now open.\" with a single space",
+      "no wording changed and paragraph 3 unchanged"
+    ]
+  },
+  {
+    "id": "a16",
+    "category": "insert-paragraph",
+    "title": "A new paragraph inserted between two existing ones",
+    "before": "Starting next month, the analytics dashboard will show data per campaign as well as per video. This makes it easier to see which activities bring in viewers.\n\nExisting reports keep working as before. Scheduled exports will continue to arrive at the usual time.",
+    "after": "Starting next month, the analytics dashboard will show data per campaign as well as per video. This makes it easier to see which activities bring in viewers.\n\nWe have also added a filter for traffic source, so you can separate paid clicks from newsletter visits and organic search. The filter appears above the chart and remembers your last choice.\n\nExisting reports keep working as before. Scheduled exports will continue to arrive at the usual time.",
+    "edits": [
+      "inserted a new paragraph between paragraph 1 and paragraph 2: \"We have also added a filter for traffic source, so you can separate paid clicks from newsletter visits and organic search. The filter appears above the chart and remembers your last choice.\"",
+      "existing paragraphs unchanged"
+    ]
+  },
+  {
+    "id": "a17",
+    "category": "delete-paragraph",
+    "title": "Paragraph 3 of 4 deleted",
+    "before": "Welcome to the team! This guide covers what you need during your first week.\n\nOn Monday you will get your laptop and access to the shared drive. Marie from IT will help with the setup and stays around for questions.\n\nLunch on Mondays is on us. The whole team usually goes to the canteen around noon, and you are welcome to join.\n\nOn Friday you will meet with your manager to talk about goals for the first three months.",
+    "after": "Welcome to the team! This guide covers what you need during your first week.\n\nOn Monday you will get your laptop and access to the shared drive. Marie from IT will help with the setup and stays around for questions.\n\nOn Friday you will meet with your manager to talk about goals for the first three months.",
+    "edits": [
+      "deleted paragraph 3 (\"Lunch on Mondays is on us. The whole team usually goes to the canteen around noon, and you are welcome to join.\") including its blank line",
+      "other paragraphs unchanged"
+    ]
+  },
+  {
+    "id": "a18",
+    "category": "insert-sentence-start-end",
+    "title": "A sentence added at the start of paragraph 1 and at the end of paragraph 2",
+    "before": "The new pricing page explains each plan in plain language and lists what is included.\n\nA comparison table at the bottom shows the differences between plans side by side.",
+    "after": "We rebuilt the pricing page this month. The new pricing page explains each plan in plain language and lists what is included.\n\nA comparison table at the bottom shows the differences between plans side by side. Questions about plans can go to the sales team.",
+    "edits": [
+      "inserted the sentence \"We rebuilt the pricing page this month.\" at the start of paragraph 1",
+      "inserted the sentence \"Questions about plans can go to the sales team.\" at the end of paragraph 2",
+      "existing sentences unchanged"
+    ]
+  },
+  {
+    "id": "a19",
+    "category": "blank-lines-only",
+    "title": "Only blank lines added, removed and reduced, no text change",
+    "before": "The Copenhagen team ships the release on Thursday.\nThe Vilnius team handles the documentation updates.\n\nSupport is briefed on Wednesday afternoon.\n\n\nCustomers are notified by email on Friday morning.\nThe changelog goes live at the same time.",
+    "after": "The Copenhagen team ships the release on Thursday.\n\nThe Vilnius team handles the documentation updates.\nSupport is briefed on Wednesday afternoon.\n\nCustomers are notified by email on Friday morning.\nThe changelog goes live at the same time.",
+    "edits": [
+      "added a blank line between \"The Copenhagen team ships the release on Thursday.\" and \"The Vilnius team handles the documentation updates.\"",
+      "removed the blank line between \"The Vilnius team handles the documentation updates.\" and \"Support is briefed on Wednesday afternoon.\"",
+      "reduced two blank lines to one between \"Support is briefed on Wednesday afternoon.\" and \"Customers are notified by email on Friday morning.\"",
+      "no words changed"
+    ]
+  },
+  {
+    "id": "a20",
+    "category": "trailing-spaces-only",
+    "title": "Only trailing whitespace changed, no visible text change",
+    "before": "Dear all,   \n\nThe quarterly review is on Tuesday at ten.\nPlease send your slides to Kristian by Monday noon.  \n\nBest,\nAistė",
+    "after": "Dear all,\n\nThe quarterly review is on Tuesday at ten. \nPlease send your slides to Kristian by Monday noon.\n\nBest,\nAistė  ",
+    "edits": [
+      "removed the three trailing spaces after \"Dear all,\"",
+      "added one trailing space after \"The quarterly review is on Tuesday at ten.\"",
+      "removed the two trailing spaces after \"Please send your slides to Kristian by Monday noon.\"",
+      "added two trailing spaces after the final \"Aistė\"",
+      "no visible words changed"
+    ]
+  },
+  {
+    "id": "a21",
+    "category": "extra-blank-lines-plus-edit",
+    "title": "Extra blank lines between paragraphs plus two real word edits",
+    "before": "The pilot ran for four weeks with twelve customers. Feedback was mostly positive.\n\nThe main complaint was the setup time, which took longer than expected.\n\nWe will fix the setup flow before the wider launch.",
+    "after": "The pilot ran for four weeks with twelve customers. Feedback was mostly positive.\n\n\n\nThe main complaint was the setup time, which took longer than we expected.\n\n\nWe will fix the setup flow before the public launch.",
+    "edits": [
+      "added two extra blank lines between paragraph 1 and paragraph 2 (one blank line became three)",
+      "inserted \"we \" so \"longer than expected\" became \"longer than we expected\" in paragraph 2",
+      "added one extra blank line between paragraph 2 and paragraph 3 (one blank line became two)",
+      "replaced \"wider\" with \"public\" in \"before the wider launch\" in paragraph 3"
+    ]
+  },
+  {
+    "id": "a22",
+    "category": "numbers-dates-prices",
+    "title": "Five numbers, dates, times and a percentage changed",
+    "before": "The Copenhagen Video Summit takes place on 14 March 2027 at the Industriens Hus. Early-bird tickets cost 1,450 DKK until 31 January, after which the price rises to 1,950 DKK. We expect around 320 attendees from 18 countries, and the first session starts at 09:30.\n\nGroups of five or more get a 10% discount. Doors open at 08:45.",
+    "after": "The Copenhagen Video Summit takes place on 21 March 2027 at the Industriens Hus. Early-bird tickets cost 1,350 DKK until 31 January, after which the price rises to 1,950 DKK. We expect around 350 attendees from 18 countries, and the first session starts at 09:00.\n\nGroups of five or more get a 15% discount. Doors open at 08:45.",
+    "edits": [
+      "changed the event date from \"14 March 2027\" to \"21 March 2027\"",
+      "changed the early-bird price from \"1,450 DKK\" to \"1,350 DKK\"",
+      "changed the expected attendance from \"320\" to \"350\"",
+      "changed the first session time from \"09:30\" to \"09:00\"",
+      "changed the group discount from \"10%\" to \"15%\"",
+      "unchanged: 31 January, 1,950 DKK, 18 countries, five or more, 08:45"
+    ]
+  },
+  {
+    "id": "a23",
+    "category": "quotes-typography",
+    "title": "Straight quotes and apostrophes changed to curly, no wording change",
+    "before": "She said, \"We can't ship before Friday,\" and the room went quiet. Later he added that the team's \"soft launch\" was really just a test.\n\nThe customer's reply was short: \"That's fine, but don't miss it.\"",
+    "after": "She said, “We can’t ship before Friday,” and the room went quiet. Later he added that the team’s “soft launch” was really just a test.\n\nThe customer’s reply was short: “That’s fine, but don’t miss it.”",
+    "edits": [
+      "replaced the straight double quotes around \"We can't ship before Friday,\" with curly double quotes",
+      "replaced the straight apostrophe in \"can't\" with a curly apostrophe",
+      "replaced the straight apostrophe in \"team's\" with a curly apostrophe",
+      "replaced the straight double quotes around \"soft launch\" with curly double quotes",
+      "replaced the straight apostrophe in \"customer's\" with a curly apostrophe",
+      "replaced the straight double quotes around \"That's fine, but don't miss it.\" with curly double quotes",
+      "replaced the straight apostrophes in \"That's\" and \"don't\" with curly apostrophes",
+      "no words changed"
+    ]
+  },
+  {
+    "id": "a24",
+    "category": "email-mixed-edits",
+    "title": "Email draft with greeting, body, short numbered list and sign-off edits",
+    "before": "Hi Mette,\n\nThanks for sending over the requirements. I read through them this morning and have a few questions before we can give you a timeline.\n\n1. Which markets should the first version cover?\n2. Who approves the final copy on your side?\n3. Do you need the integration with your CRM from day one?\n\nIf you can answer these by Thursday, we can send a plan on Friday.\n\nBest regards,\nTomas",
+    "after": "Dear Mette,\n\nThank you for sending over the requirements. I read through them yesterday and have three questions before we can give you a timeline.\n\n1. Which markets should the first version cover?\n2. Who signs off the final copy on your side?\n3. Do you need the integration with your CRM at launch?\n\nIf you can answer these by Wednesday, we can send a plan on Friday.\n\nKind regards,\nTomas",
+    "edits": [
+      "greeting changed from \"Hi Mette,\" to \"Dear Mette,\"",
+      "replaced \"Thanks for sending over\" with \"Thank you for sending over\"",
+      "replaced \"this morning\" with \"yesterday\"",
+      "replaced \"a few questions\" with \"three questions\"",
+      "list item 2: replaced \"approves\" with \"signs off\"",
+      "list item 3: replaced \"from day one\" with \"at launch\"",
+      "replaced \"by Thursday\" with \"by Wednesday\"",
+      "sign-off changed from \"Best regards,\" to \"Kind regards,\"",
+      "list item 1, \"we can send a plan on Friday\", and the name \"Tomas\" unchanged"
+    ]
+  },
+  {
+    "id": "a25",
+    "category": "marketing-hero-tighten",
+    "title": "Hero copy tightened: headline, subhead and CTA all shortened",
+    "before": "Video marketing that actually helps your team grow pipeline\n\nHost all of your videos and webinars in one place, and then track exactly which of them lead to real conversations with real buyers across your entire marketing and sales funnel.\n\nStart your free trial today and see for yourself",
+    "after": "Video marketing that grows pipeline\n\nHost your videos and webinars in one place and track which ones lead to conversations with buyers.\n\nStart your free trial",
+    "edits": [
+      "headline: replaced \"actually helps your team grow pipeline\" with \"grows pipeline\", giving \"Video marketing that grows pipeline\"",
+      "subhead: deleted \"all of \" before \"your videos\"",
+      "subhead: deleted the comma and the word \"then\" after \"in one place\"",
+      "subhead: deleted \"exactly \" before \"which\"",
+      "subhead: replaced \"which of them\" with \"which ones\"",
+      "subhead: deleted \"real \" before \"conversations\" and deleted \"real \" before \"buyers\"",
+      "subhead: deleted \" across your entire marketing and sales funnel\" before the final full stop",
+      "CTA: deleted \" today and see for yourself\" so it reads \"Start your free trial\""
+    ]
+  },
+  {
+    "id": "a26",
+    "category": "long-article-scattered-edits",
+    "title": "Sixteen-paragraph article with three scattered edits",
+    "before": "Two years ago our weekly team meeting took ninety minutes and most of it was people reading out status updates. Nobody enjoyed it, but nobody wanted to be the one to cancel it.\n\nSo we ran an experiment. For six weeks we replaced the meeting with a short written update posted every Monday morning.\n\nThe format was simple. Each person answered three questions: what did I finish, what is blocking me, and what do I need from others this week.\n\nAt first the updates were too long. People wrote essays, and nobody read them past the first paragraph.\n\nWe set a limit of one hundred and fifty words per update. It felt strict, but it forced everyone to pick what actually mattered.\n\nWithin a month the quality improved. Blockers were visible earlier, and people started replying to each other directly in the thread.\n\nManagers were the most skeptical group. They worried they would lose touch with how people were doing.\n\nIn practice the opposite happened. A written update leaves a trail, so patterns such as repeated blockers became easy to spot.\n\nWe kept one live meeting each month, thirty minutes long, for topics that need discussion. The agenda is built from questions raised in the written threads.\n\nNot everything worked. New joiners found the written format cold, and we had to pair each of them with a buddy for the first weeks.\n\nTime zones were another test. Our colleagues in Vilnius read the updates in the afternoon, which meant replies often arrived the next day.\n\nWe accepted that delay. For most topics, a reply within a day is fast enough.\n\nUrgent matters go to chat or a phone call. We agreed that the weekly update is never the place for an emergency.\n\nAfter six weeks we asked everyone whether to go back to the old meeting. Not one person voted for it.\n\nWe have kept the format ever since. The Monday update is now the first thing many of us read at work.\n\nIf you want to try this, start small. Pick one team, set a word limit and run it for a month before you decide.",
+    "after": "Two years ago our weekly team meeting took ninety minutes and most of it was people reading out status updates. Nobody enjoyed it, but nobody wanted to be the one to cancel it.\n\nSo we ran an experiment. For six weeks we replaced the meeting with a short written update posted every Monday morning.\n\nThe format was simple. Each person answered three questions: what did I complete, what is blocking me, and what do I need from others this week.\n\nAt first the updates were too long. People wrote essays, and nobody read them past the first paragraph.\n\nWe set a limit of one hundred and fifty words per update. It felt strict, but it forced everyone to pick what actually mattered.\n\nWithin a month the quality improved. Blockers were visible earlier, and people started replying to each other directly in the thread.\n\nManagers were the most skeptical group. They worried they would lose touch with how people were doing.\n\nIn practice the opposite happened. A written update leaves a trail, so patterns such as repeated blockers became easy to spot.\n\nWe kept one live meeting each month, forty-five minutes long, for topics that need discussion. The agenda is built from questions raised in the written threads.\n\nNot everything worked. New joiners found the written format cold, and we had to pair each of them with a buddy for the first weeks.\n\nTime zones were another test. Our colleagues in Vilnius read the updates in the afternoon, which meant replies often arrived the next day.\n\nWe accepted that delay. For most topics, a reply within a day is fast enough.\n\nUrgent matters go to chat or a phone call. We agreed that the weekly update is never the place for an emergency.\n\nAfter six weeks we asked everyone whether to go back to the old meeting. Nobody voted for it.\n\nWe have kept the format ever since. The Monday update is now the first thing many of us read at work.\n\nIf you want to try this, start small. Pick one team, set a word limit and run it for a month before you decide.",
+    "edits": [
+      "paragraph 3: replaced \"what did I finish\" with \"what did I complete\"",
+      "paragraph 9: replaced \"thirty minutes long\" with \"forty-five minutes long\"",
+      "paragraph 14: replaced the sentence \"Not one person voted for it.\" with \"Nobody voted for it.\"",
+      "all other paragraphs unchanged"
+    ]
+  },
+  {
+    "id": "a27",
+    "category": "very-short",
+    "title": "One-line text with a single word swapped",
+    "before": "Book your seat for the autumn webinar today.",
+    "after": "Save your seat for the autumn webinar today.",
+    "edits": [
+      "replaced \"Book\" with \"Save\""
+    ]
+  },
+  {
+    "id": "a28",
+    "category": "identical-control",
+    "title": "Identical before and after (control)",
+    "before": "The annual customer survey closed on Friday with a response rate of 41 percent. Most respondents rated onboarding as good or very good.\n\nThe lowest scores went to reporting. We will review the comments with the product team and share a summary in the next newsletter.",
+    "after": "The annual customer survey closed on Friday with a response rate of 41 percent. Most respondents rated onboarding as good or very good.\n\nThe lowest scores went to reporting. We will review the comments with the product team and share a summary in the next newsletter.",
+    "edits": []
+  }
+]

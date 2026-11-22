@@ -1,0 +1,18 @@
+#!/usr/sbin/nft -f
+# Outbound rules for the `diff` user: its shell, its rootless Docker daemon and its container.
+# The app needs no outbound network at all, so everything new is dropped; replies to Traefik pass as established.
+# Images arrive by `docker save | docker load` from an admin account (deploy/deploy.sh), never by pulling.
+# Loaded by diff-egress.service into its own table, so Docker's tables are never touched. UID is filled in by setup-box.sh.
+
+table inet diff_egress
+delete table inet diff_egress
+
+table inet diff_egress {
+	chain output {
+		type filter hook output priority filter; policy accept;
+		meta skuid != __UID__ accept
+		ct state established,related accept
+		oifname "lo" accept
+		counter drop
+	}
+}
