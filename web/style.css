@@ -235,7 +235,7 @@ body.panel-open .foot { margin-right: 400px; }
 
 /* Connect agent */
 .agent-btn { display: inline-flex; align-items: center; gap: 8px; }
-.agent-btn .api-icon { width: 30px; height: 16px; }
+.agent-btn .api-icon { width: 22px; height: 12px; }
 .agent-logos { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; color: var(--dim); }
 .agent-logo { display: inline-grid; width: 26px; height: 26px; }
 .agent-logo svg { width: 100%; height: 100%; }
