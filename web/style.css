@@ -18,11 +18,11 @@
   --del: light-dark(#c2311f, #ff7b6b);
   --del-bg: light-dark(rgba(194, 49, 31, .045), rgba(255, 123, 107, .07));
   --del-hit: light-dark(rgba(194, 49, 31, .22), rgba(255, 123, 107, .34));
-  --del-soft: light-dark(rgba(194, 49, 31, .08), rgba(255, 123, 107, .12));
+  --del-soft: light-dark(rgba(194, 49, 31, .12), rgba(255, 123, 107, .17));
   --add: light-dark(#12773f, #63d88f);
   --add-bg: light-dark(rgba(18, 119, 63, .045), rgba(99, 216, 143, .065));
   --add-hit: light-dark(rgba(18, 119, 63, .22), rgba(99, 216, 143, .32));
-  --add-soft: light-dark(rgba(18, 119, 63, .08), rgba(99, 216, 143, .11));
+  --add-soft: light-dark(rgba(18, 119, 63, .12), rgba(99, 216, 143, .16));
   --move: light-dark(#1f5fc4, #6ea8ff);
   --move-bg: light-dark(rgba(31, 95, 196, .08), rgba(110, 168, 255, .12));
   --move-hit: light-dark(rgba(31, 95, 196, .20), rgba(110, 168, 255, .30));
