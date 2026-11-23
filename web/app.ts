@@ -20,7 +20,7 @@ const el = {
   sharePop: $('sharePop'), shareLink: $<HTMLInputElement>('shareLink'), copyBtn: $<HTMLButtonElement>('copyBtn'), shareNote: $('shareNote'),
   mePop: $('mePop'), meForm: $<HTMLFormElement>('meForm'), meInput: $<HTMLInputElement>('meInput'),
   labelA: $('labelA'), headB: $('headB'), delCount: $('delCount'), addCount: $('addCount'),
-  agentBtn: $<HTMLButtonElement>('agentBtn'), agentPop: $('agentPop'), keysBtn: $<HTMLButtonElement>('keysBtn'), keysPop: $('keysPop'),
+  copyEditBtn: $<HTMLButtonElement>('copyEditBtn'), agentBtn: $<HTMLButtonElement>('agentBtn'), agentPop: $('agentPop'), keysBtn: $<HTMLButtonElement>('keysBtn'), keysPop: $('keysPop'),
 };
 
 // ── State ────────────────────────────────────────────────────────────────────────────────────────
@@ -439,7 +439,23 @@ el.versioningToggle.addEventListener('change', async () => {
 function showChrome() {
   el.historyBtn.hidden = !state.token;
   el.shareBtn.hidden = !state.token;
+  el.copyEditBtn.hidden = !state.token || state.role !== 'view';
 }
+
+/** A view-only reader's way to edit: a new diff with the texts on screen, opened on its own edit link. */
+async function editACopy() {
+  if (el.copyEditBtn.hidden) return;
+  const { left, right } = currentDocs();
+  el.copyEditBtn.disabled = true;
+  try {
+    const created = await api.create(left, right);
+    location.href = `/${created.edit}`;
+  } catch (err) {
+    el.copyEditBtn.disabled = false;
+    showBanner(err instanceof Error ? err.message : 'Could not make a copy', []);
+  }
+}
+el.copyEditBtn.addEventListener('click', editACopy);
 
 function showBanner(text: string, actions: [string, () => void][]) {
   el.bannerText.textContent = text;
@@ -463,7 +479,10 @@ function togglePop(pop: HTMLElement, anchor: HTMLElement) {
   pop.hidden = false;
   const r = anchor.getBoundingClientRect();
   pop.style.top = `${r.bottom + 8}px`;
-  pop.style.right = `${Math.max(12, window.innerWidth - r.right)}px`;
+  // Open toward the middle of the screen: left-aligned under a button on the left half, right-aligned otherwise.
+  const onLeft = r.left + r.width / 2 < window.innerWidth / 2;
+  pop.style.left = onLeft ? `${Math.max(12, r.left)}px` : 'auto';
+  pop.style.right = onLeft ? 'auto' : `${Math.max(12, window.innerWidth - r.right)}px`;
 }
 
 document.addEventListener('click', (e) => {
@@ -646,6 +665,7 @@ const SHORTCUTS: Shortcut[] = [
   { group: 'Diff', label: 'Versions', combo: as('KeyH'), button: el.historyBtn, run: clickIf(el.historyBtn) },
   { group: 'Diff', label: 'Name this version', combo: as('KeyN'), run: () => { if (!visible(el.historyBtn)) return; showHistory(true); el.nameInput.focus(); } },
   { group: 'Diff', label: 'New diff', combo: as('KeyD'), run: () => { location.href = '/'; } },
+  { group: 'Diff', label: 'Edit a copy (view-only links)', combo: as('KeyE'), button: el.copyEditBtn, run: () => void editACopy() },
   { group: 'You', label: 'Your name', combo: as('KeyR'), button: el.meBtn, run: openMe },
   { group: 'You', label: 'Connect agent', combo: as('KeyA'), button: el.agentBtn, run: openAgent },
   { group: 'You', label: 'Keyboard shortcuts', combo: as('KeyK'), button: el.keysBtn, run: () => el.keysBtn.click() },
