@@ -33,6 +33,8 @@ type Layout = 'split' | 'unified';
 const prefs = {
   layout: (localStorage.getItem('layout') as Layout) || 'split',
   gran: (localStorage.getItem('gran') as Granularity) || 'smart',
+  // Layered: the changed phrase light, the words that changed strong. Solid: the whole phrase strong.
+  marks: (localStorage.getItem('marks') as 'layered' | 'solid') || 'layered',
 };
 const state = {
   token: location.pathname.slice(1) || null as string | null,
@@ -178,6 +180,8 @@ const movedDeco = (p: Span, title: string, cont = false) => p.whole
      Decoration.widget({ widget: movedBadge, side: 1 }).range(p.to)];
 const lost = Decoration.mark({ class: 'cm-movedDel' });
 const gained = Decoration.mark({ class: 'cm-movedAdd' });
+const wordDel = Decoration.mark({ class: 'cm-wordDel' });
+const wordAdd = Decoration.mark({ class: 'cm-wordAdd' });
 
 /** Line starts that directly follow a moved whole line, on each side: those lines continue a moved block. */
 let blockEnds = { a: new Set<number>(), b: new Set<number>() };
@@ -207,7 +211,7 @@ function updateMeta() {
     const lostWords = (m: Move) => innerChanges(m.a.text, m.b.text, prefs.gran)
       .filter((c) => c.toA > c.fromA)
       .map((c) => ({ at: m.b.from + c.fromB, text: m.a.text.slice(c.fromA, c.toA) }));
-    unified.dispatch({ effects: setUnified.of(unifiedDecorations(left, right, analysis, movedInB, lostWords)) });
+    unified.dispatch({ effects: setUnified.of(unifiedDecorations(left, right, analysis, movedInB, lostWords, prefs.marks === 'layered')) });
     return;
   }
   const rangesA = [];
@@ -216,6 +220,14 @@ function updateMeta() {
     rangesA.push(...movedDeco(m.a, 'Moved to another place in After', blockEnds.a.has(m.a.from)));
     for (const c of innerChanges(m.a.text, m.b.text, prefs.gran)) if (c.toA > c.fromA) rangesA.push(lost.range(m.a.from + c.fromA, m.a.from + c.toA));
     rangesB.push(...movedInB(m));
+  }
+  // Layered: the merge view marks each changed phrase (styled light); the words that changed inside it go strong.
+  if (prefs.marks === 'layered') {
+    const inMove = (from: number, to: number, side: 'a' | 'b') => analysis.moves.some((m) => from < m[side].to && to > m[side].from);
+    for (const w of analysis.words) {
+      if (w.toA > w.fromA && !inMove(w.fromA, w.toA, 'a') && left.slice(w.fromA, w.toA).trim()) rangesA.push(wordDel.range(w.fromA, w.toA));
+      if (w.toB > w.fromB && !inMove(w.fromB, w.toB, 'b') && right.slice(w.fromB, w.toB).trim()) rangesB.push(wordAdd.range(w.fromB, w.toB));
+    }
   }
   // A changed line break draws nothing visible on its own, so it gets a small marker on the side that has it.
   // Changed indents and spaces already show as tinted blocks here.
@@ -627,6 +639,16 @@ function setGran(g: Granularity) {
   mount();
 }
 granSelect.addEventListener('change', () => setGran(granSelect.value as Granularity));
+const marksSelect = $<HTMLSelectElement>('marksSelect');
+/** Marking style; see `prefs.marks`. */
+function setMarks(m: 'layered' | 'solid') {
+  prefs.marks = m;
+  marksSelect.value = m;
+  document.body.dataset.marks = m;
+  localStorage.setItem('marks', m);
+  updateMeta();
+}
+marksSelect.addEventListener('change', () => setMarks(marksSelect.value as 'layered' | 'solid'));
 for (const b of document.querySelectorAll<HTMLButtonElement>('[data-view]')) {
   b.addEventListener('click', () => {
     prefs.layout = b.dataset.view as Layout;
@@ -669,6 +691,8 @@ window.addEventListener('resize', () => {
 async function boot() {
   pressed('view', prefs.layout);
   granSelect.value = prefs.gran;
+  marksSelect.value = prefs.marks;
+  document.body.dataset.marks = prefs.marks;
   mount();
   if (!state.token) {
     showMe(await api.me());
@@ -713,6 +737,7 @@ const SHORTCUTS: Shortcut[] = [
   { group: 'View', label: 'Smart detail', combo: as('Digit1'), run: () => setGran('smart') },
   { group: 'View', label: 'Word detail', combo: as('Digit2'), run: () => setGran('word') },
   { group: 'View', label: 'Character detail', combo: as('Digit3'), run: () => setGran('char') },
+  { group: 'View', label: 'Style: Layered / Solid', combo: as('KeyM'), run: () => setMarks(prefs.marks === 'layered' ? 'solid' : 'layered') },
   { group: 'View', label: 'Next change', combo: as('ArrowDown'), run: () => jumpToChange(1) },
   { group: 'View', label: 'Previous change', combo: as('ArrowUp'), run: () => jumpToChange(-1) },
   { group: 'View', label: 'Theme: system, light, dark', combo: as('KeyT'), button: themeBtn, run: () => themeBtn.click() },
@@ -735,6 +760,7 @@ const SHORTCUTS: Shortcut[] = [
   { group: 'Editing', label: 'Close a panel', combo: { code: 'Escape' } },
 ];
 installShortcuts(SHORTCUTS);
+marksSelect.title = `Style ${formatCombo(as('KeyM'))}: Layered marks the changed phrase light and its changed words strong; Solid marks the whole phrase strong`;
 granSelect.title = `Detail: Smart ${formatCombo(as('Digit1'))}, Word ${formatCombo(as('Digit2'))}, Char ${formatCombo(as('Digit3'))}`;
 el.keysBtn.addEventListener('click', () => { renderShortcutList(el.keysPop, SHORTCUTS); togglePop(el.keysPop, el.keysBtn); });
 

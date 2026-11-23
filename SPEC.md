@@ -41,6 +41,14 @@ SPEC.md is very small, fully semantical
   - "find some inspirations for the versioning thing and adopt."
 - Interface
   - "Super minimal interface."
+- Marking
+  - "optimizing for human attention minimization"
+  - "In the diff in VS Code, there are two level of red/green marking. red and very red. very red shows the actual changed / removed things."
+    - "I DONT need to see place, track as remove because it is NOT Removed thats confusing., but its a part of the change context, so yeah it should be somehow indicated"
+  - "no strikethroughs"
+  - "make it two styles that one can also choose so I can compare"
+    - Solid: the current single-level marking
+    - Layered: the two-level marking
 - Abuse
   - "Since its public, ratelimit public writes somehow."
   - "Max 100 new versions/diffs per day."

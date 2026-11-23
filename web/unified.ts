@@ -78,13 +78,27 @@ function movedSource(text: string, arrow: string, tag = true): HTMLElement {
 class InlineDel extends WidgetType {
   readonly text: string;
   readonly arrow: string; // '' when the text was removed, '↓' or '↑' when it moved
-  constructor(text: string, arrow: string) { super(); this.text = text; this.arrow = arrow; }
-  eq(o: InlineDel) { return o.text === this.text && o.arrow === this.arrow; }
+  readonly words: [number, number][] | null; // Layered: the removed words, strong; the rest of the phrase light
+  constructor(text: string, arrow: string, words: [number, number][] | null = null) { super(); this.text = text; this.arrow = arrow; this.words = words; }
+  eq(o: InlineDel) { return o.text === this.text && o.arrow === this.arrow && JSON.stringify(o.words) === JSON.stringify(this.words); }
   toDOM() {
     if (this.arrow) return movedSource(this.text, this.arrow);
     const el = document.createElement('del');
-    el.className = 'cm-deletedText';
-    fillDeleted(el, this.text);
+    if (!this.words) {
+      el.className = 'cm-deletedText';
+      fillDeleted(el, this.text);
+      return el;
+    }
+    el.className = 'cm-deletedSoft';
+    let at = 0;
+    for (const [f, t] of this.words) {
+      if (f > at) fillDeleted(el, this.text.slice(at, f));
+      const hit = el.appendChild(document.createElement('span'));
+      hit.className = 'cm-deletedHit';
+      fillDeleted(hit, this.text.slice(f, t));
+      at = t;
+    }
+    if (at < this.text.length) fillDeleted(el, this.text.slice(at));
     return el;
   }
 }
@@ -147,12 +161,15 @@ function badge(text: string): HTMLElement {
  * a move; `lostWords` gives the words a moved text lost on the way, struck at its new place.
  */
 export function unifiedDecorations(
-  a: string, b: string, { changes, moves, regions }: Analysis,
-  movedMarks: (m: Move) => Range<Decoration>[], lostWords: (m: Move) => { at: number; text: string }[],
+  a: string, b: string, { changes, words, moves, regions }: Analysis,
+  movedMarks: (m: Move) => Range<Decoration>[], lostWords: (m: Move) => { at: number; text: string }[], layered: boolean,
 ): DecorationSet {
   const out: Range<Decoration>[] = [];
   const movedB = moves.map((m) => m.b);
   const added = Decoration.mark({ class: 'cm-changedText' });
+  const addedSoft = Decoration.mark({ class: 'cm-changedSoft' });
+  const wordsIn = (c: { fromA: number; toA: number; fromB: number; toB: number }) =>
+    words.filter((w) => w.fromA >= c.fromA && w.toA <= c.toA && w.fromB >= c.fromB && w.toB <= c.toB);
   const addedLine = Decoration.line({ class: 'cm-insertedLine' });
   const lineStart = (pos: number) => b.lastIndexOf('\n', pos - 1) + 1;
   const inRegion = (c: Change, r: { fromA: number; toA: number; fromB: number; toB: number }) =>
@@ -174,8 +191,17 @@ export function unifiedDecorations(
           out.push(glyph(s, t).range(c.fromB));
           continue;
         }
-        if (del) out.push(Decoration.widget({ widget: new InlineDel(del, arrowFor(c.fromA, c.toA, c.fromB)), side: -1 }).range(c.fromB));
-        if (c.toB > c.fromB && !movedB.some((s) => within({ from: c.fromB, to: c.toB }, s))) out.push(added.range(c.fromB, c.toB));
+        // Layered: the phrase light, the words that changed inside it strong. Solid: the phrase strong.
+        const inner = layered ? wordsIn(c) : [];
+        if (del) {
+          const hits = layered ? inner.filter((w) => w.toA > w.fromA).map((w): [number, number] => [w.fromA - c.fromA, w.toA - c.fromA]) : null;
+          out.push(Decoration.widget({ widget: new InlineDel(del, arrowFor(c.fromA, c.toA, c.fromB), hits), side: -1 }).range(c.fromB));
+        }
+        if (c.toB > c.fromB && !movedB.some((s) => within({ from: c.fromB, to: c.toB }, s))) {
+          if (!layered) { out.push(added.range(c.fromB, c.toB)); continue; }
+          out.push(addedSoft.range(c.fromB, c.toB));
+          for (const w of inner) if (w.toB > w.fromB && b.slice(w.fromB, w.toB).trim()) out.push(added.range(w.fromB, w.toB));
+        }
       }
       continue;
     }
@@ -195,7 +221,7 @@ export function unifiedDecorations(
         if (arrow) moved.set(i, arrow);
         return pos + line.length + 1;
       }, 0);
-      const marks = inner.filter((c) => c.toA > c.fromA && (c.fromA > r.fromA || c.toA < r.toA))
+      const marks = (layered ? wordsIn(r) : inner).filter((c) => c.toA > c.fromA && (c.fromA > r.fromA || c.toA < r.toA))
         .map((c): [number, number] => [c.fromA - r.fromA, c.toA - r.fromA]);
       // Lines removed after the last line, when that line has no break, hang below it instead of above.
       const below = !!b && r.fromB >= b.length && !b.endsWith('\n');
@@ -208,7 +234,7 @@ export function unifiedDecorations(
         if (!movedB.some((s) => s.whole && s.from === pos)) out.push(addedLine.range(pos));
         pos = end < 0 ? r.toB : end + 1;
       }
-      for (const c of inner) {
+      for (const c of layered ? wordsIn(r) : inner) {
         // Only edits inside a kept line are marked; a wholly new line is already tinted.
         if (c.toB > c.fromB && (c.fromB > r.fromB || c.toB < r.toB)) out.push(added.range(c.fromB, c.toB));
       }

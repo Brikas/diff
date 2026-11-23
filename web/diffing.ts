@@ -160,6 +160,18 @@ function refine(changes: readonly Change[], a: string, b: string): Change[] {
   return out;
 }
 
+/**
+ * The exact words that changed inside one smart change, for the two-level (Layered) marking: the change is the
+ * phrase, these are the strong parts of it. Unchanged words inside the phrase are left out. After VS Code's two
+ * layers, "lines that got removed" and "text that got removed".
+ */
+function wordsWithin(c: Change, a: string, b: string): Change[] {
+  const x = a.slice(c.fromA, c.toA);
+  const y = b.slice(c.fromB, c.toB);
+  if (!x || !y) return [c];
+  return refine(wordChanges(x, y, spaceTokens), x, y).map((d) => new Change(c.fromA + d.fromA, c.fromA + d.toA, c.fromB + d.fromB, c.fromB + d.toB));
+}
+
 const inline: Record<Granularity, (a: string, b: string) => readonly Change[]> = {
   // Prose: a changed word is marked whole, punctuation included, and short unchanged gaps fold in.
   smart: (a, b) => {
@@ -232,7 +244,8 @@ export type Move = { a: Span; b: Span; similarity: number };
  * the removed words struck in place; otherwise the old lines go above the new ones as a block.
  */
 export type Region = { fromA: number; toA: number; fromB: number; toB: number; inline: boolean };
-export type Analysis = { changes: Change[]; moves: Move[]; regions: Region[] };
+/** `changes`: what changed, phrase by phrase. `words`: the exact words that changed inside those phrases. */
+export type Analysis = { changes: Change[]; words: Change[]; moves: Move[]; regions: Region[] };
 /** `home` names where a span was edited; two spans with the same home are an edit in place, never a move. */
 type Candidate = Span & { home: string };
 
@@ -254,6 +267,7 @@ export function analyze(a: string, b: string, gran: Granularity): Analysis {
   const linesA = splitLines(a);
   const linesB = splitLines(b);
   const changes: Change[] = [];
+  const words: Change[] = [];
   const regions: Region[] = [];
   const lonelyA: Candidate[] = [];
   const lonelyB: Candidate[] = [];
@@ -294,6 +308,7 @@ export function analyze(a: string, b: string, gran: Granularity): Analysis {
       for (const c of inline[gran](a.slice(fromA, toA), b.slice(fromB, toB))) {
         const ch = new Change(fromA + c.fromA, fromA + c.toA, fromB + c.fromB, fromB + c.toB);
         changes.push(ch);
+        words.push(...(gran === 'smart' ? wordsWithin(ch, a, b) : [ch]));
         const home = `${ch.fromA}:${ch.fromB}`;
         const fa = fragment(a, ch.fromA, ch.toA, home);
         const fb = fragment(b, ch.fromB, ch.toB, home);
@@ -336,7 +351,10 @@ export function analyze(a: string, b: string, gran: Granularity): Analysis {
       for (; r < stopR; r++) { lonelyA.push({ ...removed[r], whole: true, home: `a${removed[r].from}` }); posA = removed[r].to; }
       for (; d < stopD; d++) { lonelyB.push({ ...added[d], whole: true, home: `b${added[d].from}` }); posB = added[d].to; }
       if (posA > fromA || posB > fromB) {
-        changes.push(new Change(fromA, posA, fromB, posB));
+        // Whole lines removed or added: every word in them changed, so the phrase is the word level too.
+        const ch = new Change(fromA, posA, fromB, posB);
+        changes.push(ch);
+        words.push(ch);
         regions.push({ fromA, toA: posA, fromB, toB: posB, inline: false });
       }
     };
@@ -365,9 +383,10 @@ export function analyze(a: string, b: string, gran: Granularity): Analysis {
   if (nlA !== nlB && last && !last.added && !last.removed) {
     const ch = new Change(nlA ? a.length - 1 : a.length, a.length, nlB ? b.length - 1 : b.length, b.length);
     changes.push(ch);
+    words.push(ch);
     regions.push({ ...ch, inline: true });
   }
-  return { changes, moves: extendBlocks(findMoves(lonelyA, lonelyB), lonelyA, lonelyB), regions };
+  return { changes, words, moves: extendBlocks(findMoves(lonelyA, lonelyB), lonelyA, lonelyB), regions };
 }
 
 /**

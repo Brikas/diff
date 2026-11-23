@@ -110,6 +110,18 @@ test('smart marks only the quote characters when letters stay the same, and spli
   assert.ok(parts.includes(' for Saturday'), JSON.stringify(parts));
 });
 
+test('layered marking: inside a changed phrase, words kept on both sides are not among the changed words', () => {
+  const a = 'Host your videos in one place, and then track exactly which of them lead to sales.';
+  const b = 'Host your videos in one place and track which ones lead to sales.';
+  const { changes, words } = analyze(a, b, 'smart');
+  const phrase = changes.map((c) => a.slice(c.fromA, c.toA)).join('|');
+  assert.ok(phrase.includes('track'), `the phrase spans the kept words: ${phrase}`);
+  const removed = words.map((c) => a.slice(c.fromA, c.toA)).filter(Boolean);
+  for (const kept of ['place', 'track', 'which']) assert.ok(!removed.some((w) => w.includes(kept)), `${kept} is not a changed word: ${JSON.stringify(removed)}`);
+  for (const gone of ['then', 'exactly']) assert.ok(removed.some((w) => w.includes(gone)), `${gone} is a changed word: ${JSON.stringify(removed)}`);
+  for (const w of words) assert.ok(changes.some((c) => w.fromA >= c.fromA && w.toA <= c.toA && w.fromB >= c.fromB && w.toB <= c.toB), 'every word sits inside its phrase');
+});
+
 test('lines under 12 letters are never reported as moved', () => {
   const { moves } = analyze('Hello there.\nMiddle paragraph stays the same here.\nEnd.', 'End.\nMiddle paragraph stays the same here.\nHello there.', 'smart');
   for (const m of moves) assert.ok((m.a.text.match(/[\p{L}\p{N}]/gu) ?? []).length >= 12, m.a.text);

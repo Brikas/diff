@@ -18,9 +18,11 @@
   --del: light-dark(#c2311f, #ff7b6b);
   --del-bg: light-dark(rgba(194, 49, 31, .045), rgba(255, 123, 107, .07));
   --del-hit: light-dark(rgba(194, 49, 31, .22), rgba(255, 123, 107, .34));
+  --del-soft: light-dark(rgba(194, 49, 31, .08), rgba(255, 123, 107, .12));
   --add: light-dark(#12773f, #63d88f);
   --add-bg: light-dark(rgba(18, 119, 63, .045), rgba(99, 216, 143, .065));
   --add-hit: light-dark(rgba(18, 119, 63, .22), rgba(99, 216, 143, .32));
+  --add-soft: light-dark(rgba(18, 119, 63, .08), rgba(99, 216, 143, .11));
   --move: light-dark(#1f5fc4, #6ea8ff);
   --move-bg: light-dark(rgba(31, 95, 196, .08), rgba(110, 168, 255, .12));
   --move-hit: light-dark(rgba(31, 95, 196, .20), rgba(110, 168, 255, .30));
@@ -122,28 +124,33 @@ body[data-layout='unified'] #headB .label { display: none; }
 .cm-mergeView { overflow: visible !important; }
 body.readonly .cm-content { caret-color: transparent; }
 
-/* Only the changed words are marked, never whole rows: removed words red and struck, added words green.
+/* Only changed text is marked, never whole rows: removed text red, added text green, no strike-through.
+   Two strengths (Layered style, after VS Code's line and text layers): a changed phrase light, the words that
+   changed inside it strong. Solid style: the whole phrase strong.
    A thin halo of the same colour keeps a one-character mark (a quote, a comma) visible. */
+.editor del { text-decoration: none; }
 .editor .cm-merge-a .cm-changedLine, .editor .cm-merge-b .cm-changedLine { background: none !important; }
 .editor .cm-deletedChunk { background: var(--del-bg) !important; }
-.editor .cm-merge-a .cm-changedText, .editor .cm-deletedChunk .cm-deletedText {
+.editor .cm-merge-a .cm-changedText, .editor .cm-deletedChunk .cm-deletedText, .editor .cm-wordDel, .editor .cm-deletedHit,
+.editor .cm-line del.cm-deletedText {
   background: var(--del-hit) !important; border-radius: 3px; box-shadow: 0 0 0 1.5px var(--del-hit);
-  text-decoration: line-through; text-decoration-color: var(--del); text-decoration-thickness: 1.5px;
 }
-.editor .cm-merge-b .cm-changedText, .editor .cm-inlineChangedLine .cm-changedText {
+.editor .cm-merge-b .cm-changedText, .editor .cm-inlineChangedLine .cm-changedText, .editor .cm-wordAdd,
+body[data-layout='unified'] .editor .cm-changedText {
   background: var(--add-hit) !important; border-radius: 3px; box-shadow: 0 0 0 1.5px var(--add-hit);
 }
+body[data-marks='layered'] .editor .cm-merge-a .cm-changedText, .editor .cm-line del.cm-deletedSoft {
+  background: var(--del-soft) !important; border-radius: 3px; box-shadow: 0 0 0 1.5px var(--del-soft);
+}
+body[data-marks='layered'] .editor .cm-merge-b .cm-changedText, .editor .cm-changedSoft {
+  background: var(--add-soft) !important; border-radius: 3px; box-shadow: 0 0 0 1.5px var(--add-soft);
+}
+.editor .cm-line del.cm-deletedText, .editor .cm-line del.cm-deletedSoft { margin-right: 2px; }
 .editor .cm-deletedChunk { padding-left: 0; }
 .editor .cm-deletedChunk .cm-deletedLine { padding: 0 28px; }
-.editor .cm-deletedChunk del { text-decoration-color: var(--del); }
 
 /* Unified: wholly new lines are tinted; edits inside a kept line are marked in place, with no row tint. */
 body[data-layout='unified'] .editor .cm-insertedLine { background: var(--add-bg); }
-body[data-layout='unified'] .editor .cm-changedText { background: var(--add-hit); border-radius: 3px; box-shadow: 0 0 0 1.5px var(--add-hit); }
-.editor .cm-line del.cm-deletedText {
-  background: var(--del-hit); border-radius: 3px; margin-right: 2px; box-shadow: 0 0 0 1.5px var(--del-hit);
-  text-decoration: line-through; text-decoration-color: var(--del); text-decoration-thickness: 1.5px;
-}
 /* The old place of moved text: a tag pointing at the new place and a short dim preview, read once. */
 .editor .cm-movedFrom { display: inline-flex; align-items: baseline; gap: 8px; max-width: 100%; }
 .editor .cm-movedFrom .cm-movedBadge { margin-left: 0; }
@@ -159,7 +166,7 @@ body[data-layout='unified'] .editor .cm-changedText { background: var(--add-hit)
 /* Moved text: blue tint plus a word, never colour alone. Its own edits are marked against the source. */
 .editor .cm-line.cm-moved { background: var(--move-bg) !important; }
 .editor .cm-line.cm-moved .cm-changedText { background: none !important; text-decoration: none; }
-.editor .cm-movedDel { background: var(--del-hit); border-radius: 3px; text-decoration: line-through; text-decoration-color: var(--del); }
+.editor .cm-movedDel { background: var(--del-hit); border-radius: 3px; }
 .editor .cm-movedAdd { background: var(--add-hit); border-radius: 3px; }
 .editor .cm-movedText { background: var(--move-hit) !important; border-radius: 3px; }
 /* The merge view's own mark may wrap the move mark; its red, green and strike-through give way to blue. */
