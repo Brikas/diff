@@ -169,30 +169,38 @@ test('http: create, view link is read-only, edit link saves, headers block index
   assert.match(robots.text, /Disallow: \//);
 });
 
-test('http agent flow: one call makes a named user, a diff and its links; X-User acts as that user', async () => {
+test('http agent flow: one call makes a named user, a diff and its links; its secret acts as that user', async () => {
   const ip = '203.0.113.50';
   const created = await req('POST', '/api/diffs', { before: 'Easy to use.', after: 'Simple to use.', name: "John's agent" }, '', ip);
   assert.equal(created.status, 201);
   const { you, urls, edit } = created.json;
   assert.equal(you.name, "John's agent");
   assert.match(you.id, /^[A-Za-z0-9]{22}$/);
+  assert.ok(you.secret.startsWith(`${you.id}.`), 'the secret carries the id');
   assert.equal(urls.edit, `${base}/${edit}`);
   assert.deepEqual(created.json.head.authors, ["John's agent"]);
 
-  // A later call with X-User and no cookie: same user, name remembered; no base means a new version.
+  // A later call with the bearer secret and no cookie: same user, name remembered; no base means a new version.
+  const bearer = { Authorization: `Bearer ${you.secret}` };
   const res = await fetch(`${base}/api/d/${edit}`, {
     method: 'PUT', body: JSON.stringify({ before: 'Easy to use.', after: 'Very simple to use.' }),
-    headers: { 'X-Diff': '1', 'X-User': you.id, 'Content-Type': 'application/json', 'X-Forwarded-For': ip },
+    headers: { 'X-Diff': '1', ...bearer, 'Content-Type': 'application/json', 'X-Forwarded-For': ip },
   });
   const saved = await res.json();
   assert.equal(saved.kind, 'saved');
   assert.equal(saved.minted, true);
   assert.equal(res.headers.get('set-cookie'), null);
-  const me = await fetch(`${base}/api/me`, { headers: { 'X-User': you.id } }).then((r) => r.json());
+  const me = await fetch(`${base}/api/me`, { headers: bearer }).then((r) => r.json());
   assert.deepEqual(me, you);
 
-  const bad = await fetch(`${base}/api/me`, { headers: { 'X-User': 'nope' } });
-  assert.equal(bad.status, 400);
+  // Reading a diff never returns a secret, not even the reader's own.
+  const read = await fetch(`${base}/api/d/${edit}`, { headers: bearer }).then((r) => r.text());
+  assert.ok(!read.includes(you.secret.split('.')[1]));
+
+  // The id alone, a forged signature or a cut-off secret are all refused.
+  for (const auth of [`Bearer ${you.id}`, `Bearer ${you.id}.${'A'.repeat(32)}`, `Bearer ${you.secret.slice(0, -1)}`]) {
+    assert.equal((await fetch(`${base}/api/me`, { headers: { Authorization: auth } })).status, 401, auth);
+  }
   const docs = await req('GET', '/api');
   assert.match(docs.headers.get('content-type') ?? '', /markdown/);
   assert.ok(docs.text.includes(`POST ${base}/api/diffs`));
@@ -204,8 +212,21 @@ test('http: reads never write to the database, however many new visitors arrive'
   const users = () => (appStore.db.prepare('SELECT count(*) AS c FROM users').get() as { c: number }).c;
   const before = users();
   for (let i = 0; i < 20; i++) await req('GET', '/api/me', undefined, '', `198.51.100.${i}`);
-  await fetch(`${base}/api/me`, { headers: { 'X-User': 'Z'.repeat(22) } });
   assert.equal(users(), before);
+});
+
+test('http: a backed-up secret restores the login in another browser; old id-only cookies are upgraded', async () => {
+  const first = await req('PUT', '/api/me', { name: 'Desk' }, '', '198.51.100.90');
+  const { secret, id } = first.json;
+  const other = await req('POST', '/api/me/login', { secret }, '', '198.51.100.91');
+  assert.equal(other.status, 200);
+  assert.deepEqual(other.json, { id, name: 'Desk', secret });
+  assert.ok(other.cookie.startsWith(`anon=${secret}~`), 'the new browser now holds the secret');
+  assert.equal((await req('POST', '/api/me/login', { secret: `${id}.nope` }, '', '198.51.100.92')).status, 401);
+
+  const legacy = await req('GET', '/api/me', undefined, `anon=${id}~${Buffer.from('Desk').toString('base64url')}`, '198.51.100.93');
+  assert.equal(legacy.json.secret, secret);
+  assert.ok(legacy.cookie.startsWith(`anon=${secret}~`));
 });
 
 test('http: writes need the X-Diff header', async () => {

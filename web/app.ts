@@ -7,7 +7,7 @@ import { analyze, diffFor, innerChanges, type Analysis, type Granularity, type M
 import { changesBreaks, glyph, setUnified, unifiedDecorations, unifiedField, whitespaceGlyph } from './unified.ts';
 import { avatar } from './avatar.ts';
 import { renderAgentPop } from './agent.ts';
-import { installShortcuts, renderShortcutList, type Shortcut } from './keys.ts';
+import { formatCombo, installShortcuts, renderShortcutList, type Shortcut } from './keys.ts';
 
 // ── DOM ──────────────────────────────────────────────────────────────────────────────────────────
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -20,7 +20,12 @@ const el = {
   sharePop: $('sharePop'), shareLink: $<HTMLInputElement>('shareLink'), copyBtn: $<HTMLButtonElement>('copyBtn'), shareNote: $('shareNote'),
   mePop: $('mePop'), meForm: $<HTMLFormElement>('meForm'), meInput: $<HTMLInputElement>('meInput'),
   labelA: $('labelA'), headB: $('headB'), delCount: $('delCount'), addCount: $('addCount'),
-  copyEditBtn: $<HTMLButtonElement>('copyEditBtn'), agentBtn: $<HTMLButtonElement>('agentBtn'), agentPop: $('agentPop'), keysBtn: $<HTMLButtonElement>('keysBtn'), keysPop: $('keysPop'),
+  copyEditBtn: $<HTMLButtonElement>('copyEditBtn'), accessBtn: $<HTMLButtonElement>('accessBtn'), accessPop: $('accessPop'),
+  accessText: $('accessText'), ownerBadge: $('ownerBadge'),
+  backupLink: $<HTMLButtonElement>('backupLink'), restoreLink: $<HTMLButtonElement>('restoreLink'), backupBox: $('backupBox'),
+  secretField: $<HTMLInputElement>('secretField'), secretCopy: $<HTMLButtonElement>('secretCopy'),
+  restoreBox: $<HTMLFormElement>('restoreBox'), restoreField: $<HTMLInputElement>('restoreField'),
+  agentBtn: $<HTMLButtonElement>('agentBtn'), agentPop: $('agentPop'), keysBtn: $<HTMLButtonElement>('keysBtn'), keysPop: $('keysPop'),
 };
 
 // ── State ────────────────────────────────────────────────────────────────────────────────────────
@@ -324,7 +329,7 @@ async function reload() {
   refreshEditable();
   hideBanner();
   showChrome();
-  setStatus(d.role === 'view' ? 'View only' : savedLabel());
+  setStatus(d.role === 'view' ? '' : savedLabel());
   renderVersions();
 }
 
@@ -436,15 +441,33 @@ el.versioningToggle.addEventListener('change', async () => {
 });
 
 // ── Chrome: header buttons and popovers ──────────────────────────────────────────────────────────
+const LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>';
+const UNLOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 7.7-1.5"/></svg>';
+
 function showChrome() {
   el.historyBtn.hidden = !state.token;
   el.shareBtn.hidden = !state.token;
-  el.copyEditBtn.hidden = !state.token || state.role !== 'view';
+  // What this link allows: a lock for view only, an open lock for edit. It opens the owner and "Edit a copy".
+  el.accessBtn.hidden = !state.token;
+  const view = state.role === 'view';
+  el.accessBtn.innerHTML = `${view ? LOCK : UNLOCK}<span>${view ? 'View only' : 'Can edit'}</span>`;
+  el.accessBtn.title = view ? 'This link is view only. Click for the owner or to edit a copy.' : 'This link can edit. Click for the owner.';
 }
 
-/** A view-only reader's way to edit: a new diff with the texts on screen, opened on its own edit link. */
+/** Who made the diff: the first author of version 1. */
+const owner = () => state.versions.at(-1)?.authors[0] ?? '';
+
+function openAccess() {
+  const name = owner();
+  el.accessText.textContent = state.role === 'view' ? 'View only. Owner:' : 'You can edit. Owner:';
+  el.ownerBadge.replaceChildren(...(name ? [avatar(name, 'sm'), Object.assign(document.createElement('span'), { textContent: name })] : []));
+  togglePop(el.accessPop, el.accessBtn);
+}
+el.accessBtn.addEventListener('click', openAccess);
+
+/** A reader's way to edit without the edit link: a new diff with the texts on screen, opened on its own edit link. */
 async function editACopy() {
-  if (el.copyEditBtn.hidden) return;
+  if (!state.token) return;
   const { left, right } = currentDocs();
   el.copyEditBtn.disabled = true;
   try {
@@ -471,7 +494,7 @@ function showBanner(text: string, actions: [string, () => void][]) {
 }
 function hideBanner() { if (!state.viewing) el.banner.hidden = true; }
 
-const pops = () => [[el.sharePop, el.shareBtn], [el.mePop, el.meBtn], [el.agentPop, el.agentBtn], [el.keysPop, el.keysBtn]] as const;
+const pops = () => [[el.sharePop, el.shareBtn], [el.mePop, el.meBtn], [el.agentPop, el.agentBtn], [el.keysPop, el.keysBtn], [el.accessPop, el.accessBtn]] as const;
 function togglePop(pop: HTMLElement, anchor: HTMLElement) {
   const open = pop.hidden;
   for (const [p] of pops()) p.hidden = true;
@@ -519,13 +542,48 @@ el.copyBtn.addEventListener('click', async () => {
   el.copyBtn.textContent = 'Copied';
 });
 
-const me = { id: '', name: '' };
+const me = { id: '', name: '', secret: '' };
 /** The header's name button: badge plus name. */
-function showMe(who: { id: string; name: string }) {
+function showMe(who: { id: string; name: string; secret?: string }) {
   Object.assign(me, who);
   el.meBtn.replaceChildren(avatar(who.name), Object.assign(document.createElement('span'), { textContent: who.name }));
 }
-function openMe() { el.meInput.value = me.name; togglePop(el.mePop, el.meBtn); if (!el.mePop.hidden) el.meInput.focus(); }
+function openMe() {
+  el.meInput.value = me.name;
+  el.backupBox.hidden = true;
+  el.restoreBox.hidden = true;
+  togglePop(el.mePop, el.meBtn);
+  if (!el.mePop.hidden) el.meInput.focus();
+}
+
+// Back up: the login key, masked, with Copy. Restore: paste a key and this browser becomes that user.
+el.backupLink.addEventListener('click', async () => {
+  if (!me.secret) showMe(await api.me());
+  el.secretField.value = me.secret;
+  el.restoreBox.hidden = true;
+  el.backupBox.hidden = !el.backupBox.hidden;
+});
+el.secretCopy.addEventListener('click', async () => {
+  await navigator.clipboard.writeText(me.secret).catch(() => undefined); // clipboard refused: Copy stays as is
+  el.secretCopy.textContent = 'Copied';
+  setTimeout(() => { el.secretCopy.textContent = 'Copy'; }, 1500);
+});
+el.restoreLink.addEventListener('click', () => {
+  el.backupBox.hidden = true;
+  el.restoreBox.hidden = !el.restoreBox.hidden;
+  if (!el.restoreBox.hidden) el.restoreField.focus();
+});
+el.restoreBox.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  try {
+    await api.login(el.restoreField.value.trim());
+    location.reload(); // every "mine" mark and name on the page now belongs to the restored user
+  } catch (err) {
+    el.restoreField.setCustomValidity(err instanceof Error ? err.message : 'That key is not valid');
+    el.restoreField.reportValidity();
+    el.restoreField.addEventListener('input', () => el.restoreField.setCustomValidity(''), { once: true });
+  }
+});
 el.meBtn.addEventListener('click', openMe);
 el.meForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -537,10 +595,11 @@ el.meForm.addEventListener('submit', async (e) => {
 
 // Connect agent: the prompt names the edit link when there is one, so the agent can work on this diff.
 let nameStored = false;
-function openAgent() {
+async function openAgent() {
+  if (!me.secret) showMe(await api.me()); // the prompt carries the login key, which only /api/me returns
   renderAgentPop(el.agentPop, me, state.links?.edit ?? state.token);
   togglePop(el.agentPop, el.agentBtn);
-  // The server stores names only on writes; store this one now so an agent using the id gets the same name.
+  // The server stores names only on writes; store this one now so an agent using the key gets the same name.
   if (!nameStored && me.name) api.rename(me.name).then(() => { nameStored = true; }).catch(() => undefined); // retried on next open
 }
 el.agentBtn.addEventListener('click', openAgent);
@@ -554,24 +613,25 @@ function showHistory(open: boolean) {
 el.historyBtn.addEventListener('click', () => showHistory(el.history.hidden === true));
 el.historyClose.addEventListener('click', () => showHistory(false));
 
-function pressed(attr: 'view' | 'gran', value: string) {
+function pressed(attr: 'view', value: string) {
   for (const b of document.querySelectorAll<HTMLButtonElement>(`[data-${attr}]`)) {
     b.setAttribute('aria-pressed', String(b.dataset[attr] === value));
   }
 }
+const granSelect = $<HTMLSelectElement>('granSelect');
+/** Detail level of the marks: smart (whole words), word, or char. */
+function setGran(g: Granularity) {
+  prefs.gran = g;
+  granSelect.value = g;
+  localStorage.setItem('gran', g);
+  mount();
+}
+granSelect.addEventListener('change', () => setGran(granSelect.value as Granularity));
 for (const b of document.querySelectorAll<HTMLButtonElement>('[data-view]')) {
   b.addEventListener('click', () => {
     prefs.layout = b.dataset.view as Layout;
     localStorage.setItem('layout', prefs.layout);
     pressed('view', prefs.layout);
-    mount();
-  });
-}
-for (const b of document.querySelectorAll<HTMLButtonElement>('[data-gran]')) {
-  b.addEventListener('click', () => {
-    prefs.gran = b.dataset.gran as Granularity;
-    localStorage.setItem('gran', prefs.gran);
-    pressed('gran', prefs.gran);
     mount();
   });
 }
@@ -608,7 +668,7 @@ window.addEventListener('resize', () => {
 // ── Boot ─────────────────────────────────────────────────────────────────────────────────────────
 async function boot() {
   pressed('view', prefs.layout);
-  pressed('gran', prefs.gran);
+  granSelect.value = prefs.gran;
   mount();
   if (!state.token) {
     showMe(await api.me());
@@ -644,15 +704,15 @@ function jumpToChange(dir: 1 | -1) {
 const visible = (b: HTMLElement) => !b.hidden;
 const clickIf = (b: HTMLElement) => () => { if (visible(b)) b.click(); };
 const viewBtn = (v: string) => document.querySelector<HTMLButtonElement>(`[data-view="${v}"]`);
-const granBtn = (g: string) => document.querySelector<HTMLButtonElement>(`[data-gran="${g}"]`);
 const as = (code: string) => ({ alt: true, shift: true, code }); // the app's own chord: Alt+Shift / ⌥⇧
 
 const SHORTCUTS: Shortcut[] = [
   { group: 'View', label: 'Split', combo: as('KeyS'), button: viewBtn('split'), run: () => viewBtn('split')?.click() },
   { group: 'View', label: 'Unified', combo: as('KeyU'), button: viewBtn('unified'), run: () => viewBtn('unified')?.click() },
-  { group: 'View', label: 'Smart detail', combo: as('Digit1'), button: granBtn('smart'), run: () => granBtn('smart')?.click() },
-  { group: 'View', label: 'Word detail', combo: as('Digit2'), button: granBtn('word'), run: () => granBtn('word')?.click() },
-  { group: 'View', label: 'Character detail', combo: as('Digit3'), button: granBtn('char'), run: () => granBtn('char')?.click() },
+  { group: 'View', label: 'Switch Split / Unified', combo: as('KeyV'), run: () => viewBtn(prefs.layout === 'split' ? 'unified' : 'split')?.click() },
+  { group: 'View', label: 'Smart detail', combo: as('Digit1'), run: () => setGran('smart') },
+  { group: 'View', label: 'Word detail', combo: as('Digit2'), run: () => setGran('word') },
+  { group: 'View', label: 'Character detail', combo: as('Digit3'), run: () => setGran('char') },
   { group: 'View', label: 'Next change', combo: as('ArrowDown'), run: () => jumpToChange(1) },
   { group: 'View', label: 'Previous change', combo: as('ArrowUp'), run: () => jumpToChange(-1) },
   { group: 'View', label: 'Theme: system, light, dark', combo: as('KeyT'), button: themeBtn, run: () => themeBtn.click() },
@@ -665,15 +725,17 @@ const SHORTCUTS: Shortcut[] = [
   { group: 'Diff', label: 'Versions', combo: as('KeyH'), button: el.historyBtn, run: clickIf(el.historyBtn) },
   { group: 'Diff', label: 'Name this version', combo: as('KeyN'), run: () => { if (!visible(el.historyBtn)) return; showHistory(true); el.nameInput.focus(); } },
   { group: 'Diff', label: 'New diff', combo: as('KeyD'), run: () => { location.href = '/'; } },
-  { group: 'Diff', label: 'Edit a copy (view-only links)', combo: as('KeyE'), button: el.copyEditBtn, run: () => void editACopy() },
+  { group: 'Diff', label: 'Access and owner', combo: as('KeyO'), button: el.accessBtn, run: clickIf(el.accessBtn) },
+  { group: 'Diff', label: 'Edit a copy', combo: as('KeyE'), button: el.copyEditBtn, run: () => void editACopy() },
   { group: 'You', label: 'Your name', combo: as('KeyR'), button: el.meBtn, run: openMe },
-  { group: 'You', label: 'Connect agent', combo: as('KeyA'), button: el.agentBtn, run: openAgent },
+  { group: 'You', label: 'Connect agent', combo: as('KeyA'), button: el.agentBtn, run: () => void openAgent() },
   { group: 'You', label: 'Keyboard shortcuts', combo: as('KeyK'), button: el.keysBtn, run: () => el.keysBtn.click() },
   { group: 'Editing', label: 'Undo', combo: { mod: true, code: 'KeyZ' } },
   { group: 'Editing', label: 'Redo', combo: { mod: true, shift: true, code: 'KeyZ' } },
   { group: 'Editing', label: 'Close a panel', combo: { code: 'Escape' } },
 ];
 installShortcuts(SHORTCUTS);
+granSelect.title = `Detail: Smart ${formatCombo(as('Digit1'))}, Word ${formatCombo(as('Digit2'))}, Char ${formatCombo(as('Digit3'))}`;
 el.keysBtn.addEventListener('click', () => { renderShortcutList(el.keysPop, SHORTCUTS); togglePop(el.keysPop, el.keysBtn); });
 
 boot();

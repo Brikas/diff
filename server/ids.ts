@@ -1,4 +1,4 @@
-import { randomBytes, randomInt } from 'node:crypto';
+import { createHmac, randomBytes, randomInt, timingSafeEqual } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -42,5 +42,23 @@ export const currentAnonName = (name: string): string => {
   return NOUNS.includes(m[1]) ? `Anonymous ${m[1]}` : randomAnonName();
 };
 export const newAnonId = (): string => randomBase62(22);
-/** User ids have the same shape as link tokens; they name a person, they grant no access. */
+/** User ids have the same shape as link tokens; they tell people apart and grant nothing. */
 export const isUserId = (s: string): boolean => TOKEN_RE.test(s);
+
+/**
+ * A user's secret: `<user id>.<signature>`, the signature an HMAC of the id under the server's key. It is the only
+ * credential for writing as that user, and carries the id, so one paste logs a person in anywhere.
+ * Signed, so nothing per user is stored to check it and nobody can make one for an id without the key.
+ */
+export const userSecret = (id: string, key: string): string =>
+  `${id}.${createHmac('sha256', key).update(id).digest('base64url').slice(0, 32)}`;
+
+/** The user id inside a valid secret, or null for anything forged, truncated or malformed. */
+export function idFromSecret(secret: string, key: string): string | null {
+  const dot = secret.indexOf('.');
+  const id = secret.slice(0, dot);
+  if (dot < 0 || !isUserId(id)) return null;
+  const given = Buffer.from(secret);
+  const expected = Buffer.from(userSecret(id, key));
+  return given.length === expected.length && timingSafeEqual(given, expected) ? id : null;
+}

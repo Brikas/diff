@@ -18,13 +18,13 @@
     <button data-view="split" aria-pressed="true">Split</button>
     <button data-view="unified" aria-pressed="false">Unified</button>
   </div>
-  <div class="seg" role="group" aria-label="Detail">
-    <button data-gran="smart" aria-pressed="true" title="Whole words, tiny gaps merged">Smart</button>
-    <button data-gran="word" aria-pressed="false" title="Every changed word">Word</button>
-    <button data-gran="char" aria-pressed="false" title="Every changed character">Char</button>
-  </div>
+  <select id="granSelect" class="select" aria-label="Detail">
+    <option value="smart">Smart</option>
+    <option value="word">Word</option>
+    <option value="char">Char</option>
+  </select>
   <button id="agentBtn" class="ghost agent-btn" title="Connect agent: API for coding agents">
-    <svg class="api-icon" viewBox="0 0 34 20" aria-hidden="true"><rect x="1" y="1" width="32" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"/><text x="17" y="14.2" text-anchor="middle" fill="currentColor" font-family="Atkinson Hyperlegible Mono, ui-monospace, monospace" font-size="10.5" font-weight="700">API</text></svg>
+    <svg class="api-icon" viewBox="0 0 26 14" aria-hidden="true"><text x="13" y="11.5" text-anchor="middle" fill="currentColor" font-family="Atkinson Hyperlegible Mono, ui-monospace, monospace" font-size="12.5" font-weight="700">API</text></svg>
     <span>Connect agent</span>
   </button>
   <button id="keysBtn" class="icon-btn" title="Keyboard shortcuts" aria-label="Keyboard shortcuts">
@@ -33,7 +33,7 @@
   <button id="themeBtn" class="icon-btn"></button>
   <span class="grow"></span>
   <span class="status" id="status" aria-live="polite"></span>
-  <button id="copyEditBtn" class="primary" hidden title="This link is view only: make your own editable copy on a new link">Edit a copy</button>
+  <button id="accessBtn" class="ghost access-btn" hidden></button>
   <button id="historyBtn" class="ghost" hidden>History</button>
   <button id="shareBtn" class="primary" hidden>Share</button>
   <button id="meBtn" class="me" title="Your name on versions"></button>
@@ -90,12 +90,27 @@
   <p class="note" id="shareNote"></p>
 </div>
 
-<div class="pop" id="mePop" hidden role="dialog" aria-label="Your name">
+<div class="pop" id="mePop" hidden role="dialog" aria-label="You">
   <form id="meForm" class="row">
-    <input id="meInput" maxlength="40" aria-label="Your name">
+    <input id="meInput" maxlength="40" autocomplete="off" data-1p-ignore data-lpignore="true" aria-label="Your name">
     <button class="primary" type="submit">Save</button>
   </form>
   <p class="note">Shown next to the versions you edit.</p>
+  <p class="note">Your login is saved in this browser automatically. <button class="link" id="backupLink" type="button">Back it up</button>, or <button class="link" id="restoreLink" type="button">restore</button> from an existing one.</p>
+  <div id="backupBox" class="stack" hidden>
+    <div class="row"><input id="secretField" type="password" readonly autocomplete="off" data-1p-ignore data-lpignore="true" aria-label="Your login key"><button class="ghost" id="secretCopy" type="button">Copy</button></div>
+    <p class="note">Keep this key private: anyone with it can edit as you. Your user id is the part before the dot.</p>
+  </div>
+  <form id="restoreBox" class="row" hidden>
+    <input id="restoreField" autocomplete="off" data-1p-ignore data-lpignore="true" spellcheck="false" placeholder="Paste a login key" aria-label="Login key to restore">
+    <button class="ghost" type="submit">Restore</button>
+  </form>
+</div>
+
+<div class="pop" id="accessPop" hidden role="dialog" aria-label="Access">
+  <div class="owner"><span class="note" id="accessText"></span><span id="ownerBadge" class="owner-badge"></span></div>
+  <button class="primary" id="copyEditBtn" type="button">Edit a copy</button>
+  <p class="note">A copy is a new diff with these texts, on your own edit link.</p>
 </div>
 
 <div class="pop pop-wide" id="agentPop" hidden role="dialog" aria-label="Connect an agent"></div>

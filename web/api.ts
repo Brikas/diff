@@ -3,6 +3,8 @@ export type VersionMeta = {
   name: string | null; restoredFrom: number | null; size: number;
 };
 export type VersionFull = VersionMeta & { left: string; right: string };
+/** The caller: `secret` is their login key, returned only to them. */
+export type Me = { id: string; name: string; secret: string };
 export type DiffState = {
   role: 'edit' | 'view'; rev: number; versioning: boolean; me: string; you: { id: string; name: string };
   links: { edit?: string; view: string }; head: VersionFull; versions: VersionMeta[];
@@ -33,8 +35,9 @@ async function call<T>(method: string, path: string, body?: unknown, keepalive =
 }
 
 export const api = {
-  me: () => call<{ id: string; name: string }>('GET', '/api/me'),
-  rename: (name: string) => call<{ id: string; name: string }>('PUT', '/api/me', { name }),
+  me: () => call<Me>('GET', '/api/me'),
+  rename: (name: string) => call<Me>('PUT', '/api/me', { name }),
+  login: (secret: string) => call<Me>('POST', '/api/me/login', { secret }),
   create: (left: string, right: string) =>
     call<{ edit: string; view: string; rev: number; head: VersionMeta }>('POST', '/api/diffs', { left, right }),
   load: (token: string) => call<DiffState>('GET', `/api/d/${token}`),

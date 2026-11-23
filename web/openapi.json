@@ -5,100 +5,478 @@
     "version": "1.0.0",
     "description": "Compare a Before and an After text and share the result by link. Prose guide for agents: {{origin}}/api"
   },
-  "servers": [{ "url": "{{origin}}" }],
+  "servers": [
+    {
+      "url": "{{origin}}"
+    }
+  ],
   "components": {
     "parameters": {
-      "XDiff": { "name": "X-Diff", "in": "header", "required": true, "schema": { "const": "1" }, "description": "Required on every write." },
-      "XUser": { "name": "X-User", "in": "header", "required": false, "schema": { "type": "string", "pattern": "^[A-Za-z0-9]{22}$" }, "description": "Act as this user id. Omit to get a new user." },
-      "Token": { "name": "token", "in": "path", "required": true, "schema": { "type": "string", "pattern": "^[A-Za-z0-9]{22}$" }, "description": "Edit or view token from a diff link." },
-      "N": { "name": "n", "in": "path", "required": true, "schema": { "type": "integer", "minimum": 1 } }
+      "XDiff": {
+        "name": "X-Diff",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "const": "1"
+        },
+        "description": "Required on every write."
+      },
+      "Token": {
+        "name": "token",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9]{22}$"
+        },
+        "description": "Edit or view token from a diff link."
+      },
+      "N": {
+        "name": "n",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
     },
     "schemas": {
-      "You": { "type": "object", "properties": { "id": { "type": "string" }, "name": { "type": "string" } } },
-      "Texts": {
-        "type": "object", "required": ["before", "after"],
+      "You": {
+        "type": "object",
         "properties": {
-          "before": { "type": "string", "description": "Before and After together: at most 1 MB of UTF-8 text." },
-          "after": { "type": "string" },
-          "name": { "type": "string", "maxLength": 40, "description": "Renames the calling user first." }
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "secret": {
+            "type": "string",
+            "description": "Only in /api/me and diff creation, and only for yourself."
+          }
+        }
+      },
+      "Texts": {
+        "type": "object",
+        "required": [
+          "before",
+          "after"
+        ],
+        "properties": {
+          "before": {
+            "type": "string",
+            "description": "Before and After together: at most 1 MB of UTF-8 text."
+          },
+          "after": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 40,
+            "description": "Renames the calling user first."
+          }
         }
       },
       "Version": {
         "type": "object",
         "properties": {
-          "n": { "type": "integer" }, "authors": { "type": "array", "items": { "type": "string" } },
-          "createdAt": { "type": "integer" }, "updatedAt": { "type": "integer" }, "name": { "type": ["string", "null"] },
-          "restoredFrom": { "type": ["integer", "null"] }, "size": { "type": "integer" }
+          "n": {
+            "type": "integer"
+          },
+          "authors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "integer"
+          },
+          "updatedAt": {
+            "type": "integer"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "restoredFrom": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "size": {
+            "type": "integer"
+          }
         }
       },
-      "Error": { "type": "object", "properties": { "error": { "type": "string" } } }
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "userSecret": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "A user secret, <user_id>.<signature>. Omit to act as a new user; it comes back in you.secret."
+      }
     }
   },
   "paths": {
     "/api/diffs": {
       "post": {
-        "summary": "Create a diff (and a user, unless X-User is sent) and get its links",
-        "parameters": [{ "$ref": "#/components/parameters/XDiff" }, { "$ref": "#/components/parameters/XUser" }],
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Texts" } } } },
+        "summary": "Create a diff (and a user, unless a Bearer secret is sent) and get its links",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/XDiff"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Texts"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "Created",
-            "content": { "application/json": { "schema": { "type": "object", "properties": {
-              "urls": { "type": "object", "properties": { "edit": { "type": "string" }, "view": { "type": "string" } } },
-              "edit": { "type": "string" }, "view": { "type": "string" }, "rev": { "type": "integer" },
-              "you": { "$ref": "#/components/schemas/You" }, "head": { "$ref": "#/components/schemas/Version" }
-            } } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "urls": {
+                      "type": "object",
+                      "properties": {
+                        "edit": {
+                          "type": "string"
+                        },
+                        "view": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "edit": {
+                      "type": "string"
+                    },
+                    "view": {
+                      "type": "string"
+                    },
+                    "rev": {
+                      "type": "integer"
+                    },
+                    "you": {
+                      "$ref": "#/components/schemas/You"
+                    },
+                    "head": {
+                      "$ref": "#/components/schemas/Version"
+                    }
+                  }
+                }
+              }
+            }
           },
-          "429": { "description": "Daily limit", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+          "429": {
+            "description": "Daily limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
         }
       }
     },
     "/api/d/{token}": {
       "get": {
         "summary": "Read the latest version, the version list and the links",
-        "parameters": [{ "$ref": "#/components/parameters/Token" }, { "$ref": "#/components/parameters/XUser" }],
-        "responses": { "200": { "description": "OK" }, "404": { "description": "Unknown token" } }
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Unknown token"
+          }
+        }
       },
       "put": {
         "summary": "Save new texts (edit token only)",
-        "parameters": [{ "$ref": "#/components/parameters/Token" }, { "$ref": "#/components/parameters/XDiff" }, { "$ref": "#/components/parameters/XUser" }],
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "allOf": [
-          { "$ref": "#/components/schemas/Texts" },
-          { "type": "object", "properties": { "base": { "type": "integer", "description": "The rev you last read. Omit to save as a new version without a conflict check." } } }
-        ] } } } },
-        "responses": { "200": { "description": "Saved" }, "403": { "description": "View-only link" }, "409": { "description": "Someone saved since base" } }
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Token"
+          },
+          {
+            "$ref": "#/components/parameters/XDiff"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Texts"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "base": {
+                        "type": "integer",
+                        "description": "The rev you last read. Omit to save as a new version without a conflict check."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Saved"
+          },
+          "403": {
+            "description": "View-only link"
+          },
+          "409": {
+            "description": "Someone saved since base"
+          }
+        }
       }
     },
     "/api/me": {
-      "get": { "summary": "Who you are", "parameters": [{ "$ref": "#/components/parameters/XUser" }], "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/You" } } } } } },
+      "get": {
+        "summary": "Who you are",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/You"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "summary": "Rename yourself",
-        "parameters": [{ "$ref": "#/components/parameters/XDiff" }, { "$ref": "#/components/parameters/XUser" }],
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "required": ["name"], "properties": { "name": { "type": "string", "maxLength": 40 } } } } } },
-        "responses": { "200": { "description": "OK" } }
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/XDiff"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 40
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/d/{token}/v/{n}": {
-      "get": { "summary": "One version's texts", "parameters": [{ "$ref": "#/components/parameters/Token" }, { "$ref": "#/components/parameters/N" }], "responses": { "200": { "description": "OK" } } }
+      "get": {
+        "summary": "One version's texts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Token"
+          },
+          {
+            "$ref": "#/components/parameters/N"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     },
     "/api/d/{token}/v/{n}/name": {
       "put": {
         "summary": "Name a version (null clears)",
-        "parameters": [{ "$ref": "#/components/parameters/Token" }, { "$ref": "#/components/parameters/N" }, { "$ref": "#/components/parameters/XDiff" }],
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "name": { "type": ["string", "null"], "maxLength": 80 } } } } } },
-        "responses": { "200": { "description": "OK" } }
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Token"
+          },
+          {
+            "$ref": "#/components/parameters/N"
+          },
+          {
+            "$ref": "#/components/parameters/XDiff"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 80
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/api/d/{token}/v/{n}/restore": {
-      "post": { "summary": "Copy an old version on top as a new version", "parameters": [{ "$ref": "#/components/parameters/Token" }, { "$ref": "#/components/parameters/N" }, { "$ref": "#/components/parameters/XDiff" }, { "$ref": "#/components/parameters/XUser" }], "responses": { "200": { "description": "OK" } } }
+      "post": {
+        "summary": "Copy an old version on top as a new version",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Token"
+          },
+          {
+            "$ref": "#/components/parameters/N"
+          },
+          {
+            "$ref": "#/components/parameters/XDiff"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     },
     "/api/d/{token}/settings": {
       "put": {
         "summary": "Turn automatic versions on or off",
-        "parameters": [{ "$ref": "#/components/parameters/Token" }, { "$ref": "#/components/parameters/XDiff" }],
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "required": ["versioning"], "properties": { "versioning": { "type": "boolean" } } } } } },
-        "responses": { "200": { "description": "OK" } }
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Token"
+          },
+          {
+            "$ref": "#/components/parameters/XDiff"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "versioning"
+                ],
+                "properties": {
+                  "versioning": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/me/login": {
+      "post": {
+        "summary": "Become the user a secret belongs to (sets the browser login)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/XDiff"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "secret"
+                ],
+                "properties": {
+                  "secret": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/You"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid secret"
+          }
+        }
       }
     }
-  }
+  },
+  "security": [
+    {
+      "userSecret": []
+    },
+    {}
+  ]
 }

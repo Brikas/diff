@@ -23,6 +23,11 @@ SPEC.md is very small, fully semantical
 ## Spec
 - Identity
   - "No login. Anonymous identity stored by cookie "Anon {random entity noun}"."
+  - "user_id = the differentiator"
+  - "user_secret = but that allows to do writes as a user (it contains user_id inside of it, so to login one only needs one copy/paste)"
+    - "technically secret and could not leak when reading requests"
+  - "Click on the user icon has something to save/copy and then insert the user secret. But mostly minimal in design"
+    - "also it should say in the modal."
 - Sharing
   - "Link sharing has view or edit access. Edit default."
   - "Each link is private and non indexable. ~16+ chars long for secrecy."

@@ -4,7 +4,8 @@ import path from 'node:path';
 import zlib from 'node:zlib';
 import { Store, type Author, type SaveResult } from './store.ts';
 import { Limiter, type LimitConfig } from './limits.ts';
-import { anonNameFor, currentAnonName, isToken, isUserId, newAnonId } from './ids.ts';
+import { randomBytes } from 'node:crypto';
+import { anonNameFor, currentAnonName, idFromSecret, isToken, isUserId, newAnonId, userSecret } from './ids.ts';
 
 export type Config = LimitConfig & {
   publicDir: string;
@@ -32,6 +33,9 @@ const SECURITY_HEADERS: Record<string, string> = {
 };
 
 type Asset = { body: Buffer; gz: Buffer; br: Buffer; type: string; immutable: boolean };
+
+/** The caller: a user, and whether they came with a bearer secret (an agent) or the browser cookie. */
+type Me = Author & { viaBearer: boolean };
 
 /** Public paths of the agent docs → the built file behind each. */
 const DOCS: Record<string, string> = { '/api': '/api.md', '/api.md': '/api.md', '/llms.txt': '/api.md', '/openapi.json': '/openapi.json' };
@@ -104,55 +108,61 @@ export function createApp(store: Store, cfg: Config) {
     return last || req.socket.remoteAddress || 'unknown';
   }
 
+  // Signs user secrets; created once and kept in the database, so secrets survive restarts.
+  const userKey = store.metaValue('user_key', () => randomBytes(32).toString('base64url'));
+  const nameOf = (id: string) => store.userName(id) ?? anonNameFor(id);
+
   /**
-   * Who is calling. An `X-User` header (agents and scripts) names a user id directly; otherwise the browser
-   * cookie; otherwise a new anonymous user is minted. `fromHeader` callers never get a cookie set.
+   * Who is calling. `Authorization: Bearer <user secret>` (agents, scripts) or the browser cookie, which holds
+   * the same secret; otherwise a new anonymous user is minted. Bearer callers never get a cookie set.
    * Reading never writes to the database: a name is stored only when its user writes (see `remember`),
    * so a flood of reads cannot grow the users table.
    */
-  function identity(req: http.IncomingMessage, res: http.ServerResponse): Author & { fromHeader: boolean } {
-    const header = String(req.headers['x-user'] ?? '');
-    if (header) {
-      if (!isUserId(header)) throw new HttpError(400, 'X-User must be a user id: 22 letters and digits');
-      return { id: header, name: store.userName(header) ?? anonNameFor(header), fromHeader: true };
+  function identity(req: http.IncomingMessage, res: http.ServerResponse): Me {
+    const auth = String(req.headers.authorization ?? '');
+    if (auth) {
+      const id = idFromSecret(/^Bearer\s+(\S+)$/i.exec(auth)?.[1] ?? '', userKey);
+      if (!id) throw new HttpError(401, 'Authorization must be "Bearer <user secret>" with a valid secret');
+      return { id, name: nameOf(id), viaBearer: true };
     }
     const raw = String(req.headers.cookie ?? '').split(';').map((c) => c.trim()).find((c) => c.startsWith(COOKIE + '='));
     if (raw) {
-      const [id, enc] = raw.slice(COOKIE.length + 1).split('~');
+      const [cred, enc] = raw.slice(COOKIE.length + 1).split('~');
       let name = '';
       try { name = Buffer.from(enc ?? '', 'base64url').toString('utf8'); } catch { /* malformed cookie: replaced below */ }
-      if (isUserId(id) && name && name.length <= 40) {
+      // A cookie from before secrets holds a bare user id: it is upgraded to that id's secret once.
+      const id = cred.includes('.') ? idFromSecret(cred, userKey) : isUserId(cred) ? cred : null;
+      if (id && name && name.length <= 40) {
         const current = currentAnonName(name); // same person, name brought to the current form
-        if (current !== name) setIdentity(res, { id, name: current });
-        return { id, name: current, fromHeader: false };
+        if (current !== name || !cred.includes('.')) setIdentity(res, { id, name: current });
+        return { id, name: current, viaBearer: false };
       }
     }
     const id = newAnonId();
     const author = { id, name: anonNameFor(id) };
     setIdentity(res, author);
-    return { ...author, fromHeader: false };
+    return { ...author, viaBearer: false };
   }
 
-  /** Stores the caller's name, so an agent sending their id later sees the same name. Writes only. */
+  /** Stores the caller's name, so the same user on another device or an agent sees it. Writes only. */
   function remember(me: Author) {
     if (store.userName(me.id) !== me.name) store.setUserName(me.id, me.name, Date.now());
   }
 
   function setIdentity(res: http.ServerResponse, author: Author) {
-    const value = `${author.id}~${Buffer.from(author.name, 'utf8').toString('base64url')}`;
+    const value = `${userSecret(author.id, userKey)}~${Buffer.from(author.name, 'utf8').toString('base64url')}`;
     const parts = [`${COOKIE}=${value}`, 'Path=/', `Max-Age=${YEAR_S}`, 'HttpOnly', 'SameSite=Lax'];
     if (cfg.secureCookies) parts.push('Secure');
     res.setHeader('Set-Cookie', parts.join('; '));
   }
 
   /** Renames the caller everywhere their name lives: the users table, and the cookie for a browser. */
-  function rename(res: http.ServerResponse, me: Author & { fromHeader: boolean }, raw: unknown): Author {
+  function rename(res: http.ServerResponse, me: Me, raw: unknown) {
     const name = String(raw ?? '').trim().replace(/\s+/g, ' ');
     if (!name || name.length > 40) throw new HttpError(400, 'Name must be 1–40 characters');
     remember({ id: me.id, name });
-    if (!me.fromHeader) setIdentity(res, { id: me.id, name });
+    if (!me.viaBearer) setIdentity(res, { id: me.id, name });
     me.name = name;
-    return { id: me.id, name };
   }
 
   /** The public origin, for absolute links in responses (Traefik terminates TLS and says so). */
@@ -196,7 +206,7 @@ export function createApp(store: Store, cfg: Config) {
     json(res, 200, result);
   }
 
-  async function api(req: http.IncomingMessage, res: http.ServerResponse, url: URL, me: Author & { fromHeader: boolean }, ipHash: string) {
+  async function api(req: http.IncomingMessage, res: http.ServerResponse, url: URL, me: Me, ipHash: string) {
     const method = req.method ?? 'GET';
     const now = Date.now();
     const parts = url.pathname.split('/').filter(Boolean); // ['api', ...]
@@ -208,14 +218,25 @@ export function createApp(store: Store, cfg: Config) {
     if (write) remember(me); // writes are rate limited, so the users table grows only as fast as they allow
     const mintAllowed = () => limiter.tryMint(ipHash, now);
 
+    // The caller's own identity. The secret goes only to its owner, and only from /api/me and diff creation.
     const you = () => ({ id: me.id, name: me.name });
+    const youWithSecret = () => ({ ...you(), secret: userSecret(me.id, userKey) });
 
-    if (parts[1] === 'me') {
-      if (method === 'GET') return json(res, 200, you());
-      if (method === 'PUT') return json(res, 200, rename(res, me, (await readJson(req))?.name));
+    if (parts[1] === 'me' && parts.length === 2) {
+      if (method === 'GET') return json(res, 200, youWithSecret());
+      if (method === 'PUT') { rename(res, me, (await readJson(req))?.name); return json(res, 200, youWithSecret()); }
+    }
+    // Restore a login from a backed-up secret: this browser becomes that user.
+    if (parts[1] === 'me' && parts[2] === 'login' && parts.length === 3 && method === 'POST') {
+      const id = idFromSecret(String((await readJson(req))?.secret ?? '').trim(), userKey);
+      if (!id) throw new HttpError(401, 'That key is not valid');
+      const user = { id, name: nameOf(id) };
+      setIdentity(res, user);
+      Object.assign(me, user);
+      return json(res, 200, youWithSecret());
     }
 
-    // One call for agents: who you are (new unless X-User is sent), your name, the diff, and both links.
+    // One call for agents: who you are (new unless a bearer secret is sent), your name, the diff, and both links.
     if (parts[1] === 'diffs' && parts.length === 2 && method === 'POST') {
       writable();
       const body = await readJson(req);
@@ -228,7 +249,7 @@ export function createApp(store: Store, cfg: Config) {
       return json(res, 201, {
         edit: created.editToken, view: created.viewToken, rev: 1, head: store.out(head, me.id),
         urls: { edit: `${base}/${created.editToken}`, view: `${base}/${created.viewToken}` },
-        you: you(),
+        you: youWithSecret(),
       });
     }
 
