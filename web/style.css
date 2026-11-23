@@ -157,7 +157,12 @@ body[data-layout='unified'] .editor .cm-insertedLine { background: var(--add-bg)
 .editor .cm-movedPreview { color: var(--dim); font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .editor .cm-deletedLine.cm-movedRow { background: var(--move-bg); }
 
-/* Whitespace edits (line breaks, indents, spacing) are invisible as text, so they get a small marker. */
+/* A blank line added or removed between paragraphs is a whole green or red row. */
+.editor .cm-line.cm-blankAdd { background: var(--add-soft) !important; }
+.editor .cm-line.cm-blankDel, .editor .cm-blankDelRow { background: var(--del-soft) !important; }
+.editor .cm-blankDelRow { height: 1.65em; }
+
+/* Other whitespace edits (a line break with no blank line, indents, spacing) get a small marker. */
 .editor .cm-wsGlyph {
   display: inline-block; margin: 0 3px; padding: 0 5px; border-radius: 4px; font: 14px/1.4 var(--mono);
   color: var(--dim); border: 1px solid var(--line); vertical-align: 1px; cursor: help;

@@ -61,6 +61,8 @@ SPEC.md is very small, fully semantical
   - "Goal: minimize attention requirement for a human to know what actually changed." (Airidas)
   - "no use case for code, thats not needed, but bullet indented text is relevant" (Airidas)
   - "The unified wastes so much attention. Only the word test cahnges, but it shows the whole thing as changed... The the git does it better" (Airidas)
+  - "the spacing differences (paragraphs) should be literally full lines in red/green, not some bullshit marking" (Airidas)
+  - "the layered, lower contrast one should be a little bit more contrast please" (Airidas)
 - Identity
   - "Castle? Radish? these are not entitiies. it must be 'alive' things. Radish is fine but not Castle" (Airidas)
   - "Anon -> Anonymous" (Airidas)

@@ -4,7 +4,7 @@ import { defaultKeymap, history as undoHistory, historyKeymap } from '@codemirro
 import { MergeView } from '@codemirror/merge';
 import { api, ApiError, type VersionMeta, type VersionFull, type SaveResult } from './api.ts';
 import { analyze, diffFor, innerChanges, type Analysis, type Granularity, type Move, type Span } from './diffing.ts';
-import { changesBreaks, glyph, setUnified, unifiedDecorations, unifiedField, whitespaceGlyph } from './unified.ts';
+import { blankLinesIn, breakDelta, changesBreaks, glyph, setUnified, unifiedDecorations, unifiedField, whitespaceGlyph } from './unified.ts';
 import { avatar } from './avatar.ts';
 import { renderAgentPop } from './agent.ts';
 import { formatCombo, installShortcuts, renderShortcutList, type Shortcut } from './keys.ts';
@@ -180,6 +180,8 @@ const movedDeco = (p: Span, title: string, cont = false) => p.whole
      Decoration.widget({ widget: movedBadge, side: 1 }).range(p.to)];
 const lost = Decoration.mark({ class: 'cm-movedDel' });
 const gained = Decoration.mark({ class: 'cm-movedAdd' });
+const blankAddLine = Decoration.line({ class: 'cm-blankAdd', attributes: { title: 'Blank line added' } });
+const blankDelLine = Decoration.line({ class: 'cm-blankDel', attributes: { title: 'Blank line removed' } });
 const wordDel = Decoration.mark({ class: 'cm-wordDel' });
 const wordAdd = Decoration.mark({ class: 'cm-wordAdd' });
 
@@ -229,15 +231,21 @@ function updateMeta() {
       if (w.toB > w.fromB && !inMove(w.fromB, w.toB, 'b') && right.slice(w.fromB, w.toB).trim()) rangesB.push(wordAdd.range(w.fromB, w.toB));
     }
   }
-  // A changed line break draws nothing visible on its own, so it gets a small marker on the side that has it.
+  // Line-break edits draw nothing visible on their own. Blank lines that came or went become whole green or
+  // red rows on the side that has them; a break with no blank line (lines joined or split) gets a ¶ marker.
   // Changed indents and spaces already show as tinted blocks here.
   for (const c of analysis.changes) {
     const removed = left.slice(c.fromA, c.toA);
     const inserted = right.slice(c.fromB, c.toB);
     if (removed.trim() || inserted.trim() || !changesBreaks(removed, inserted)) continue;
+    const delta = breakDelta(removed, inserted);
+    const blanks = delta > 0 ? blankLinesIn(right, c.fromB, c.toB, delta) : blankLinesIn(left, c.fromA, c.toA, -delta);
+    if (blanks.length) {
+      for (const s of blanks) (delta > 0 ? rangesB : rangesA).push((delta > 0 ? blankAddLine : blankDelLine).range(s));
+      continue;
+    }
     const [s, t] = whitespaceGlyph(removed, inserted, c.fromB === 0 || right[c.fromB - 1] === '\n');
-    // On the side that has the extra breaks only.
-    if (t.includes('added')) rangesB.push(glyph(s, t).range(c.fromB));
+    if (delta > 0) rangesB.push(glyph(s, t).range(c.fromB));
     else rangesA.push(glyph(s, t).range(c.fromA));
   }
   merge!.a.dispatch({ effects: setMoves.of(Decoration.set(rangesA, true)) });

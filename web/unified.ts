@@ -37,6 +37,40 @@ function glyphNode(symbol: string, title: string): HTMLElement {
 }
 
 const breaks = (s: string) => (s.match(/\n/g) ?? []).length;
+
+/**
+ * Blank lines a change added or removed in `doc`: up to as many as the line breaks it gained, starting at or
+ * just after the change. They are drawn as whole red or green rows, the way a paragraph gap reads.
+ */
+export function blankLinesIn(doc: string, from: number, to: number, count: number): number[] {
+  const out: number[] = [];
+  let s = doc.lastIndexOf('\n', from - 1) + 1;
+  while (out.length < count && s <= to && s <= doc.length) {
+    const end = doc.indexOf('\n', s);
+    const line = doc.slice(s, end < 0 ? doc.length : end);
+    if (!line.trim() && s >= from - 1) out.push(s);
+    if (end < 0) break;
+    s = end + 1;
+  }
+  return out;
+}
+
+/** Line breaks a whitespace change added (positive) or removed (negative). */
+export const breakDelta = (removed: string, added: string) => breaks(added) - breaks(removed);
+
+class BlankRows extends WidgetType {
+  readonly count: number;
+  constructor(count: number) { super(); this.count = count; }
+  eq(o: BlankRows) { return o.count === this.count; }
+  toDOM() {
+    const box = document.createElement('div');
+    box.title = this.count === 1 ? 'Blank line removed' : `${this.count} blank lines removed`;
+    for (let i = 0; i < this.count; i++) box.appendChild(document.createElement('div')).className = 'cm-blankDelRow';
+    return box;
+  }
+  get estimatedHeight() { return 28 * this.count; }
+}
+const blankAdd = Decoration.line({ class: 'cm-blankAdd', attributes: { title: 'Blank line added' } });
 /** Whether a whitespace-only change adds or removes line breaks, the edit the reader cannot otherwise see. */
 export const changesBreaks = (removed: string, added: string) => breaks(removed) !== breaks(added);
 
@@ -180,17 +214,35 @@ export function unifiedDecorations(
     return m ? (m.b.from >= here ? '↓' : '↑') : '';
   };
 
+  /**
+   * A whitespace-only edit. Blank lines that came or went are whole green or red rows; a line break with no
+   * blank line (lines joined or split) and indent or spacing edits get their small marker.
+   */
+  const spacing = (fromA: number, toA: number, fromB: number, toB: number) => {
+    const del = a.slice(fromA, toA);
+    const ins = b.slice(fromB, toB);
+    const delta = breakDelta(del, ins);
+    const blanks = delta > 0 ? blankLinesIn(b, fromB, toB, delta) : delta < 0 ? blankLinesIn(a, fromA, toA, -delta) : [];
+    if (!blanks.length) {
+      const [s, t] = whitespaceGlyph(del, ins, fromB === lineStart(fromB));
+      out.push(glyph(s, t).range(fromB));
+      return;
+    }
+    if (delta > 0) { for (const s of blanks) out.push(blankAdd.range(s)); return; }
+    // Removed blank lines show where they were: before the line the edit starts, or after the line it ends.
+    const atStart = fromB === lineStart(fromB);
+    const end = b.indexOf('\n', fromB);
+    const pos = atStart ? fromB : end < 0 ? b.length : end;
+    out.push(Decoration.widget({ widget: new BlankRows(blanks.length), block: true, side: atStart ? -1 : 1 }).range(pos));
+  };
+
   for (const r of regions) {
     const inner = changes.filter((c) => inRegion(c, r));
     if (r.inline) {
       for (const c of inner) {
         const del = a.slice(c.fromA, c.toA);
         const ins = b.slice(c.fromB, c.toB);
-        if (isBlank(del) && isBlank(ins)) {
-          const [s, t] = whitespaceGlyph(del, ins, c.fromB === lineStart(c.fromB));
-          out.push(glyph(s, t).range(c.fromB));
-          continue;
-        }
+        if (isBlank(del) && isBlank(ins)) { spacing(c.fromA, c.toA, c.fromB, c.toB); continue; }
         // Layered: the phrase light, the words that changed inside it strong. Solid: the phrase strong.
         const inner = layered ? wordsIn(c) : [];
         if (del) {
@@ -205,14 +257,10 @@ export function unifiedDecorations(
       }
       continue;
     }
-    // Only blank lines came or went: a marker, not an empty tinted band.
+    // Only blank lines came or went: whole rows.
     const textA = a.slice(r.fromA, r.toA);
     const textB = b.slice(r.fromB, r.toB);
-    if (isBlank(textA) && isBlank(textB)) {
-      const [s, t] = whitespaceGlyph(textA, textB, true);
-      out.push(glyph(s, t).range(lineStart(Math.min(r.fromB, b.length))));
-      continue;
-    }
+    if (isBlank(textA) && isBlank(textB)) { spacing(r.fromA, r.toA, r.fromB, r.toB); continue; }
     // Block: old lines above, new lines tinted.
     if (r.toA > r.fromA) {
       const moved = new Map<number, string>();
